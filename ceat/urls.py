@@ -13,10 +13,10 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
+from django.contrib.auth.models import User
 from django.conf.urls import url, include
 from django.contrib import admin
 from rest_framework import routers, serializers, viewsets
-from django.contrib.auth.models import User
 from users.models import Profile
 
 
@@ -39,7 +39,7 @@ class ProfileSerializer(serializers.HyperlinkedModelSerializer):
 
 	class Meta:
 		model = Profile
-		fields = ('url', 'user_details', 'bio', 'birth_date', 'groups')
+		fields = ('url', 'user_details', 'bio', 'birth_date', 'groups', 'preferences')
 
 # ViewSets define the view behavior.
 class ProfileViewSet(viewsets.ModelViewSet):
