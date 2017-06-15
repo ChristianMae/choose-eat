@@ -13,7 +13,7 @@ class UserGroup(models.Model):
 	creator = models.ForeignKey(User, on_delete=models.CASCADE)
 
 	def __str__(self):
-		return self.name
+		return '{} (by {})'.format(self.name, self.creator)
 
 
 class Profile(models.Model):
@@ -24,8 +24,10 @@ class Profile(models.Model):
 	user = models.OneToOneField(User, on_delete=models.CASCADE)
 	bio = models.TextField(max_length=500, blank=True)
 	birth_date = models.DateField(null=True, blank=True)
-	groups = models.ManyToManyField(UserGroup)
+	groups = models.ManyToManyField(UserGroup, blank=True)
 
+	def __str__(self):
+		return "{}'s profile".format(self.user.username)
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
@@ -41,8 +43,11 @@ def save_user_profile(sender, instance, **kwargs):
 class Friendship(models.Model):
 	"""
 	Relationship of UserA and UserB (for Friend List)
-	Status = 0 (Pending request) | 1 (Accepted)
+	Friends = 0 (Pending request) | 1 (Accepted)
 	"""
 	user_a = models.OneToOneField(User, on_delete=models.CASCADE, related_name='userA')
 	user_b = models.OneToOneField(User, on_delete=models.CASCADE, related_name='userB')
 	friends = models.BooleanField(default=False)
+
+	def __str__(self):
+		return '{} -> {}'.format(self.user_a.username, self.user_b.username)
