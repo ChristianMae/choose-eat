@@ -49,9 +49,9 @@ class Friendship(models.Model):
 	Relationship of UserA and UserB (for Friend List)
 	Friends = 0 (Pending request) | 1 (Accepted)
 	"""
-	user_a = models.OneToOneField(User, on_delete=models.CASCADE, related_name='userA')
-	user_b = models.OneToOneField(User, on_delete=models.CASCADE, related_name='userB')
+	user_a = models.ForeignKey(User, on_delete=models.CASCADE, related_name='userA')
+	user_b = models.ForeignKey(User, on_delete=models.CASCADE, related_name='userB')
 	friends = models.BooleanField(default=False)
 
 	def __str__(self):
-		return '{} -> {}'.format(self.user_a.username, self.user_b.username)
+		return '{} -> {} ({})'.format(self.user_a.username, self.user_b.username, 'Friends' if self.friends else 'Pending')

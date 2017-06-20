@@ -55,5 +55,6 @@ router.register(r'profiles', ProfileViewSet)
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^', include(router.urls)),
+    url(r'^rec/', include('recommender.urls', namespace='recommender')),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]
