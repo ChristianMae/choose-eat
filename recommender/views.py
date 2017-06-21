@@ -11,8 +11,7 @@ def soloRecommendation(user=None, longitude=125.6018725, latitude=7.0689124, key
 		likes = query_api(longitude, latitude, keyword)['businesses']
 		allRestaurants = query_api(longitude, latitude)['businesses']
 		others = [x for x in allRestaurants if x not in likes]
-		result = likes + others
-		return HttpResponse(json.dumps(result), content_type="application/json")
+		return HttpResponse(json.dumps({'related': likes, 'others': others}), content_type="application/json")
 	else:
 		# Preferences
 		print("Hello")
