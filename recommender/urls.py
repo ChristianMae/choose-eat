@@ -3,5 +3,6 @@ from . import views
 
 
 urlpatterns = [
-    url(r'^(?P<keyword>[\w\-@.+_]+)/$', views.soloRecommendation, name='solorec'),
+    url(r'^(?P<term>[\w\-@.+_]+)/$', views.soloRecommendation, name='solorec'),
+    url(r'^$', views.soloRecommendation, name='solorec_key'),
 ]
