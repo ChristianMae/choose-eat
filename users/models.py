@@ -32,6 +32,10 @@ class Profile(models.Model):
 	def __str__(self):
 		return "{}'s profile".format(self.user.username)
 
+	def __int__(self):
+		return int(self.pk)
+
+
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
