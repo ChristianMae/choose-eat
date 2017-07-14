@@ -1,13 +1,12 @@
+import json
+import time
+from random import shuffle
 from django.http import HttpResponse
 from django.shortcuts import render
-from django.contrib.auth.models import User
-from random import shuffle
-import json
-import os
+from django.contrib.auth.models import Group
+from users.models import User
+from ceat.settings import CATEGORY_DICT
 from .utils import query_api
-from ceat.settings import CATEGORY_DICT, BASE_DIR
-from users.models import UserGroup
-import time
 
 
 def soloRecommendation(request, user=1, latitude=7.0689124, longitude=125.6018725, term=None):
@@ -15,7 +14,7 @@ def soloRecommendation(request, user=1, latitude=7.0689124, longitude=125.601872
 	#allRestaurants = query_api(longitude, latitude)['businesses']
 	allRestaurants = [x['name'] for x in query_api(longitude, latitude)['businesses']]
 	forUser = User.objects.get(pk=user)
-	user_prefs = eval(forUser.profile.preferences)
+	user_prefs = eval(forUser.preferences)
 	user_dislikes = [x for x in user_prefs if user_prefs[x] == -1]
 	categoryDislikes = []
 	for category in user_dislikes:
@@ -58,7 +57,7 @@ def groupRecommendation(request, userList={1,4}, groupList=[1], latitude=7.06891
 	#allRestaurants = query_api(longitude, latitude)['businesses']
 	allRestaurants = [x['name'] for x in query_api(longitude, latitude)['businesses']]
 	for group in groupList:
-		usersInGroup = UserGroup.objects.get(pk=group).profile_set.all()
+		usersInGroup = Group.objects.get(pk=group).user_set.all()
 		for user in usersInGroup:
 			userList.add(int(user))
 
@@ -67,7 +66,7 @@ def groupRecommendation(request, userList={1,4}, groupList=[1], latitude=7.06891
 		# Give recommendations using keyword
 		categoryDislikes = set()
 		for user in userList:
-			user_prefs = eval(user.profile.preferences)
+			user_prefs = eval(user.preferences)
 			user_dislikes = [x for x in user_prefs if user_prefs[x] == -1]
 			for category in user_dislikes:
 				categoryDislikes.add(CATEGORY_DICT[category])
@@ -91,7 +90,7 @@ def groupRecommendation(request, userList={1,4}, groupList=[1], latitude=7.06891
 		prefScores = dict()
 		allDislikes, allLikes = set(), set()
 		for user in userList:
-			user_prefs = eval(user.profile.preferences)
+			user_prefs = eval(user.preferences)
 			for pref in user_prefs:
 				if user_prefs[pref] == 1:
 					prefScores[pref] = prefScores[pref] + 1 if pref in prefScores else 1

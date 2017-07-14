@@ -27,7 +27,7 @@ with open(os.path.join(BASE_DIR, 'secretkey.txt')) as f:
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
+AUTH_USER_MODEL = 'users.User'
 
 # Application definition
 
@@ -138,3 +138,4 @@ with open(os.path.join(BASE_DIR, 'catAliases.txt')) as f:
     CATEGORY_DICT = eval(f.read())
 with open(os.path.join(BASE_DIR, 'defaultpref.txt')) as f:
     DEFAULT_PREFS = f.read()
+    

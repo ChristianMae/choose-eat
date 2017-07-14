@@ -13,43 +13,39 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
-from django.contrib.auth.models import User
+from users.models import User, Group
 from django.conf.urls import url, include
 from django.contrib import admin
 from rest_framework import routers, serializers, viewsets
-from users.models import Profile
 
 
 # Serializers define the API representation.
 # User Serializer
 class UserSerializer(serializers.HyperlinkedModelSerializer):
-	class Meta:
-		model = User
-		fields = ('url', 'username', 'first_name', 'last_name', 'email')
+    class Meta:
+        model = User
+        fields = ('url', 'username', 'first_name', 'last_name', 'email', 'bio', 'birth_date', 'preferences', 'date_joined')
 
 # ViewSets define the view behavior.
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
-# Profile Serializer
-class ProfileSerializer(serializers.HyperlinkedModelSerializer):
-	user_details = UserSerializer(source='user')
-	groups = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
-
-	class Meta:
-		model = Profile
-		fields = ('url', 'user_details', 'bio', 'birth_date', 'groups', 'preferences')
+# User Serializer
+class GroupSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Group
+        fields = ('url', 'name', 'creator', 'members')
 
 # ViewSets define the view behavior.
-class ProfileViewSet(viewsets.ModelViewSet):
-    queryset = Profile.objects.all()
-    serializer_class = ProfileSerializer
+class GroupViewSet(viewsets.ModelViewSet):
+    queryset = Group.objects.all()
+    serializer_class = GroupSerializer
 
 # Routers provide an easy way of automatically determining the URL conf.
 router = routers.DefaultRouter()
 router.register(r'users', UserViewSet)
-router.register(r'profiles', ProfileViewSet)
+router.register(r'groups', GroupViewSet)
 
 
 urlpatterns = [
