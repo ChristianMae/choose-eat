@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework_swagger',
     # M i n e
     'recommender',
     'users'
@@ -72,13 +73,13 @@ TEMPLATES = [
     },
 ]
 
-REST_FRAMEWORK = {
-    # Use Django's standard `django.contrib.auth` permissions,
-    # or allow read-only access for unauthenticated users.
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-    ]
-}
+# REST_FRAMEWORK = {
+#     # Use Django's standard `django.contrib.auth` permissions,
+#     # or allow read-only access for unauthenticated users.
+#     'DEFAULT_PERMISSION_CLASSES': [
+#         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+#     ]
+# }
 
 WSGI_APPLICATION = 'ceat.wsgi.application'
 
@@ -131,11 +132,15 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "recommender/static"),
+    '/var/www/static/',
+]
 
 
 # Global
 with open(os.path.join(BASE_DIR, 'catAliases.txt')) as f:
     CATEGORY_DICT = eval(f.read())
 with open(os.path.join(BASE_DIR, 'defaultpref.txt')) as f:
-    DEFAULT_PREFS = f.read()
+    DEFAULT_PREFS = f.read().strip()
     

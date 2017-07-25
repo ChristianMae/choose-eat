@@ -82,7 +82,8 @@ def search(bearer_token, longitude, latitude, term, categories):
         'longitude': longitude,
         'latitude': latitude,
         'categories': categories,
-        'limit': 50
+        'limit': 50,
+        'radius': 40000
     }
 
     if term:

@@ -17,6 +17,8 @@ from users.models import User, Group
 from django.conf.urls import url, include
 from django.contrib import admin
 from rest_framework import routers, serializers, viewsets
+from rest_framework_swagger.views import get_swagger_view
+from recommender.views import solRec
 
 
 # Serializers define the API representation.
@@ -47,10 +49,12 @@ router = routers.DefaultRouter()
 router.register(r'users', UserViewSet)
 router.register(r'groups', GroupViewSet)
 
-
+schema_view = get_swagger_view(title="Choose-Eat API")
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^', include(router.urls)),
-    url(r'^rec/', include('recommender.urls', namespace='recommender')),
+    url(r'^api/', include(router.urls)),
+    url(r'^swagger/', schema_view),
+    url(r'^api/soloRec', soloRecommendation.as_view()),
+    url(r'', include('recommender.urls', namespace='recommender')),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]

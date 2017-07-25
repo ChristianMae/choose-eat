@@ -1,0 +1,116 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Choose-Eat | tagline</title>
+	<link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.1/css/materialize.min.css">
+	<link href="https://fonts.googleapis.com/css?family=Chewy" rel="stylesheet">
+	<link rel="stylesheet" href="{% static "recommender/styles.css" %}">
+	<link rel='shortcut icon' href="{% static "recommender/favicon.ico" %}" type="image/x-icon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+</head>
+
+<body>
+	<header>
+	  <nav class="black pinned" style="z-index:1000;">
+	    <div class="container grey darken-4">
+	      <div class="nav-wrapper">
+	        <a href="{% url 'recommender:home' %}" class="brand-logo logofontbold">Choose-Eat</a>
+	        <ul class="right hide-on-med-and-down">
+	          <li><a href="#about" class="logofont smtext">About</a></li>
+	          <li><a href="#stats" class="logofont smtext">Stats</a></li>
+	          <li><a href="#connect" class="logofont smtext">Connect</a></li>
+	        </ul>
+	      </div>
+	    </div>
+	  </nav>
+	</header>
+
+	<main>	    
+	    <div class="parallax-container" id="start">
+	    	<div class="parallax white-text">
+	    		<img src="{% static "recommender/topimg.jpg" %}" style="z-index: -999;">
+	    		<br/><br/><br/><br/>
+	    		<h1 class="center-align logofontbold white-text bigtext shadowed">Choose-Eat</h1>
+	    		<h5 class="center-align white-text logofont shadowed">We Choose what you Eat!</h5>
+	    		<br/><br/><br/>
+	    		{% block forerror %}
+	    		{% endblock %}
+	    	</div>
+	    </div>
+
+	    {% block otherpanels %}
+	    <div class="section white" id="about">
+	    <div class="row container" style="height: 20rem;">
+	      <ul id="about-items">
+	      <li style="opacity:0;"><h2 class="header logofont">About</h2></li>
+	      <li style="opacity:0;"><p class="black-text thinfont medfont" style="max-width: 1000px; word-wrap: break-word;">
+	      	 <i>dock</i> &emsp;|&emsp;/däk/&emsp;|&emsp;verb&emsp;|<br/> - to cut short <br/> - to take away a part of
+	      	 <br />
+	      	 <small>(From <a href="https://www.merriam-webster.com/dictionary/dock">Merriam-Webster's 3rd definition</a>)</small>
+		<br /><br />
+	      	<b><i>Dock</i> is basically yet another URL shortener, similar to <a href="https://bitly.com/">Bitly</a>. 
+		<br /><br />
+		Turn a long URL like this:
+		<br />
+		https://www.youtube.com/watch?v=QslJYDX3o8s&amp;list=PLBDeA3o056yyMUiRG3xCXaSDan_bGG-Ho
+		<br /><br />
+		Into something like this:
+		<br />
+		http://dockr.herokuapp.com/a5dfmp
+		<br /><br />
+	      	This way, links are more manageable, easier to share, and kept secret. 
+	      	<br />
+	      	Dock is a school project, made with the use of <a href="https://www.djangoproject.com/">Django</a> and <a href="http://materializecss.com/">MaterializeCSS</a>.</b> 
+	      </p></li>
+	      </ul>
+	      </div>
+	    </div>
+	
+
+	{% block headercard %}
+    	{% endblock %}
+	 
+	 
+	    <div class="parallax-container" id="stats">
+	    	<div class="parallax white-text">
+	    		<img src="{% static "recommender/lowimg.jpg" %}" style="z-index: -999;">
+	    	</div>
+	    </div>
+	    {% endblock %}
+    </main>
+
+    <footer class="page-footer grey darken-4" id="connect">
+      <div class="container">
+        <div class="row">
+          <div class="col s12 l4" style="overflow: hidden;">
+            <h5 class="white-text thickfont">Yeah</h5> 
+            <p class="white-text">Yeah</p>
+          </div>
+
+          <div class="col s12 l4" style="overflow: hidden;">
+            <h5 class="white-text thickfont">Yeah2</h5> 
+            <p class="white-text">Yeah2</p>
+          </div>
+
+          <div class="col s12 l4" style="overflow: hidden;">
+            <h5 class="white-text thickfont">Yeah3</h5> 
+            <p class="white-text">Yeah3</p>
+          </div>
+        </div>
+      </div>
+      <div class="footer-copyright black thinfont">
+        <div class="container">
+        © 2017
+        <a class="white-text right" href="#start" style="text-decoration: none;"><i class="material-icons tiny left">arrow_upward</i> Back to top</a>
+        </div>
+      </div>
+    </footer>
+
+	<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.1/js/materialize.min.js"></script>
+    <script src="{% static 'recommender/scripts.js' %}"></script>    
+</body>
+</html>

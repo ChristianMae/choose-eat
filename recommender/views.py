@@ -3,61 +3,83 @@ import time
 from random import shuffle
 from django.http import HttpResponse
 from django.shortcuts import render
-from django.contrib.auth.models import Group
-from users.models import User
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from users.models import User, Group
 from ceat.settings import CATEGORY_DICT
 from .utils import query_api
 
 
-def soloRecommendation(request, user=1, latitude=7.0689124, longitude=125.6018725, term=None):
-	start_time = time.time()
-	#allRestaurants = query_api(longitude, latitude)['businesses']
-	allRestaurants = [x['name'] for x in query_api(longitude, latitude)['businesses']]
-	forUser = User.objects.get(pk=user)
-	user_prefs = eval(forUser.preferences)
-	user_dislikes = [x for x in user_prefs if user_prefs[x] == -1]
-	categoryDislikes = []
-	for category in user_dislikes:
-		categoryDislikes.append(CATEGORY_DICT[category])
-	categoryDislikeString = ','.join(categoryDislikes)
-	print('Dislikes: {}'.format(categoryDislikeString))
-	#dislikes = query_api(longitude, latitude, categories=categoryDislikeString)['businesses'] if categoryDislikeString else []
-	dislikes = [x['name'] for x in query_api(longitude, latitude, categories=categoryDislikeString)['businesses']] if categoryDislikeString else []
-	if term:
-		# Give recommendations using keyword
-		#likes = query_api(longitude, latitude, term)['businesses']
-		likes = [x['name'] for x in query_api(longitude, latitude, term)['businesses']]
-		print('Search term: {}'.format(term))	
-	else:
-		# Give recommendations based on user preferences
-		user_likes = [x for x in user_prefs if user_prefs[x] == 1]
-		categoryLikes = []
-		for category in user_likes:
-			categoryLikes.append(CATEGORY_DICT[category])
-		categoryLikeString = ','.join(categoryLikes)
-		print('Likes: {}'.format(categoryLikeString))
-		#likes = query_api(longitude, latitude, categories=categoryLikeString)['businesses']
-		likes = [x['name'] for x in query_api(longitude, latitude, categories=categoryLikeString)['businesses']]
-	dislikes = set(dislikes)
-	dislikes = list(dislikes)
-	semilikes = [x for x in dislikes if x in likes]
-	for item in semilikes:
-		likes.remove(item)
-	others = [x for x in allRestaurants if x not in likes+semilikes+dislikes]
-	dislikes = [x for x in dislikes if x not in semilikes]
-	shuffle(likes)
-	shuffle(semilikes)
-	shuffle(others)
-	print("--- %s seconds ---" % (time.time() - start_time))
-	return HttpResponse(json.dumps({'likes': likes, 'semilikes': semilikes, 'others': others, 'dislikes': dislikes}), content_type="application/json")
+class soloRecommendation(APIView):
+    """
+    Solo Restaurant Recommendation
+
+    Parameters:
+    uid (int) - User ID
+    latitude (double) - Latitude of User's current location
+    longitude (double) - Longitude of User's current location
+    term (string) - Optional search term
+    """
+    def get(self, request, format=None):
+        """
+        Returns restaurant recommendation based on user's preferences and location
+        """
+        uid = int(self.request.query_params.get('uid'))
+        latitude = float(self.request.query_params.get('latitude'))
+        longitude = float(self.request.query_params.get('longitude'))
+        term = self.request.query_params.get('term')
+
+        allRestaurants = [x['name'] for x in query_api(longitude, latitude)['businesses']]
+        user = User.objects.get(pk=uid)
+        user_prefs = eval(user.preferences)
+        user_dislikes = [x for x in user_prefs if user_prefs[x] == -1]
+        categoryDislikes = []
+        for category in user_dislikes:
+        	categoryDislikes.append(CATEGORY_DICT[category])
+        categoryDislikeString = ','.join(categoryDislikes)
+        print('Dislikes: {}'.format(categoryDislikeString))
+        #dislikes = query_api(longitude, latitude, categories=categoryDislikeString)['businesses'] if categoryDislikeString else []
+        dislikes = [x['name'] for x in query_api(longitude, latitude, categories=categoryDislikeString)['businesses']] if categoryDislikeString else []
+        if term:
+        	# Give recommendations using keyword
+        	#likes = query_api(longitude, latitude, term)['businesses']
+        	likes = [x['name'] for x in query_api(longitude, latitude, term)['businesses']]
+        	print('Search term: {}'.format(term))	
+        else:
+        	# Give recommendations based on user preferences
+        	user_likes = [x for x in user_prefs if user_prefs[x] == 1]
+        	categoryLikes = []
+        	for category in user_likes:
+        		categoryLikes.append(CATEGORY_DICT[category])
+        	categoryLikeString = ','.join(categoryLikes)
+        	print('Likes: {}'.format(categoryLikeString))
+        	#likes = query_api(longitude, latitude, categories=categoryLikeString)['businesses']
+        	likes = [x['name'] for x in query_api(longitude, latitude, categories=categoryLikeString)['businesses']]
+        dislikes = set(dislikes)
+        dislikes = list(dislikes)
+        semilikes = [x for x in dislikes if x in likes]
+        for item in semilikes:
+        	likes.remove(item)
+        others = [x for x in allRestaurants if x not in likes+semilikes+dislikes]
+        dislikes = [x for x in dislikes if x not in semilikes]
+        shuffle(likes)
+        shuffle(semilikes)
+        shuffle(others)
+        return Response(json.dumps({'likes': likes, 'semilikes': semilikes, 'others': others, 'dislikes': dislikes}), content_type="application/json")
+
+
+def home(request):
+	template = 'recommender/home.html'
+	context = {}	
+	return render(request, template, context)
 	
 
-def groupRecommendation(request, userList={1,4}, groupList=[1], latitude=7.0689124, longitude=125.6018725, term=None):
+def groupRecommendation(request, userList={1}, groupList=[1], latitude=7.0689124, longitude=125.6018725, term=None):
 	start_time = time.time()
 	#allRestaurants = query_api(longitude, latitude)['businesses']
 	allRestaurants = [x['name'] for x in query_api(longitude, latitude)['businesses']]
 	for group in groupList:
-		usersInGroup = Group.objects.get(pk=group).user_set.all()
+		usersInGroup = Group.objects.get(pk=group).members.all()
 		for user in usersInGroup:
 			userList.add(int(user))
 
@@ -123,13 +145,14 @@ def groupRecommendation(request, userList={1,4}, groupList=[1], latitude=7.06891
 		print('Likes: {}'.format(likeString))
 		print('Semi-likes: {}'.format(semilikeString))
 		print('Dislikes: {}'.format(dislikeString))
-		semilikes = [x['name'] for x in query_api(longitude, latitude, categories=semilikeString)['businesses']]
+		semilikes = [x['name'] for x in query_api(longitude, latitude, categories=semilikeString)['businesses']] if semilikeString else []
 		likes = [x['name'] for x in query_api(longitude, latitude, categories=likeString)['businesses'] if x['name'] not in semilikes]
 		dislikes = [x['name'] for x in query_api(longitude, latitude, categories=dislikeString)['businesses'] if x['name'] not in likes+semilikes]
 		others = [x for x in allRestaurants if x not in likes+semilikes+dislikes]
 	shuffle(likes)
 	shuffle(semilikes)
 	shuffle(others)
+	print(len(likes)+len(semilikes)+len(others)+len(dislikes))
 	print("--- %s seconds ---" % (time.time() - start_time))
 	return HttpResponse(json.dumps({'likes': likes, 'semilikes': semilikes, 'others': others, 'dislikes': dislikes}), content_type="application/json")
 
