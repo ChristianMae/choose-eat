@@ -24,9 +24,9 @@ with open(os.path.join(BASE_DIR, 'secretkey.txt')) as f:
     SECRET_KEY = f.read()
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 AUTH_USER_MODEL = 'users.User'
 
 # Application definition

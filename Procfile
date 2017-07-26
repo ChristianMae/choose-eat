@@ -1,0 +1,1 @@
+web: gunicorn ceat.wsgi --log-file -
