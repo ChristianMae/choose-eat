@@ -1,5 +1,6 @@
 import json
 import time
+import requests
 from random import shuffle
 from django.http import HttpResponse
 from django.shortcuts import render
@@ -12,7 +13,7 @@ from .utils import query_api
 
 class soloRecommendation(APIView):
     """
-    Solo Restaurant Recommendation
+    Solo Restaurant Recommendation Endpoint
 
     Parameters:
     uid (int) - User ID
@@ -65,9 +66,37 @@ class soloRecommendation(APIView):
         shuffle(likes)
         shuffle(semilikes)
         shuffle(others)
-        return Response(json.dumps({'likes': likes, 'semilikes': semilikes, 'others': others, 'dislikes': dislikes}), content_type="application/json")
+        return HttpResponse(json.dumps({'likes': likes, 'semilikes': semilikes, 'others': others, 'dislikes': dislikes}), content_type="application/json")
 
 
+class login(APIView):
+    """
+    Login Endpoint
+
+    Parameters:
+    username (string) - User's username
+    password (string) - User's password
+    """
+    def get(self, request, format=None):
+        """
+        Returns user details if credentials are valid, else an error
+        """
+        username = self.request.query_params.get('username')
+        password = self.request.query_params.get('password')
+        
+        try:
+        	user = User.objects.get(username=username)
+        	if user.check_password(password):
+        		url = 'http://127.0.0.1:8000/api/users/{}'.format(user.id)
+        		response = requests.get(url).json()
+        	else:
+        		response = json.dumps({'error': 'Invalid password!'})
+        except User.DoesNotExist:
+        	response = json.dumps({'error': 'User does not exist!'}) 
+        
+        return Response(response, content_type="application/json")
+
+        
 def home(request):
 	template = 'recommender/home.html'
 	context = {}	
@@ -159,7 +188,5 @@ def groupRecommendation(request, userList={1}, groupList=[1], latitude=7.0689124
 """
 Missing:
 - Consider price levels and location range
-- Follow DRY (Probably combine both methods, but have a way to know if solo or group)
-- Find out how to use URL Params for API Requests (remove hardcoded parameters)
 - Deal with same name but different restaurants
 """

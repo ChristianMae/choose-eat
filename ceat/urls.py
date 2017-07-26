@@ -18,7 +18,7 @@ from django.conf.urls import url, include
 from django.contrib import admin
 from rest_framework import routers, serializers, viewsets
 from rest_framework_swagger.views import get_swagger_view
-from recommender.views import solRec
+from recommender.views import soloRecommendation, login
 
 
 # Serializers define the API representation.
@@ -54,7 +54,8 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^api/', include(router.urls)),
     url(r'^swagger/', schema_view),
-    url(r'^api/soloRec', soloRecommendation.as_view()),
+    url(r'^api/soloRecommendation', soloRecommendation.as_view()),
+    url(r'^api/login', login.as_view()),
     url(r'', include('recommender.urls', namespace='recommender')),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]
