@@ -69,6 +69,111 @@ class soloRecommendation(APIView):
         return HttpResponse(json.dumps({'likes': likes, 'semilikes': semilikes, 'others': others, 'dislikes': dislikes}), content_type="application/json")
 
 
+class groupRecommendation(APIView):
+    """
+    Group Restaurant Recommendation Endpoint
+
+    Parameters:
+    uid_list (set) - List of User IDs
+    gid_list (list) - List of Groups
+    latitude (double) - Latitude of User's current location
+    longitude (double) - Longitude of User's current location
+    term (string) - Optional search term
+    """
+    def get(self, request, format=None):
+        """
+        Returns restaurant recommendation based on group's preferences and location
+        """
+        try:
+	        uid_list = set(eval(self.request.query_params.get('uid_list')))
+	        gid_list = list(eval(self.request.query_params.get('gid_list')))
+	        latitude = float(self.request.query_params.get('latitude'))
+	        longitude = float(self.request.query_params.get('longitude'))
+	        term = self.request.query_params.get('term')
+        except:
+        	return HttpResponse(json.dumps({'error': 'Error! Invalid parameters!'}), content_type="application/json")
+
+        #allRestaurants = query_api(longitude, latitude)['businesses']
+        allRestaurants = [x['name'] for x in query_api(longitude, latitude)['businesses']]
+        for group in gid_list:
+        	usersInGroup = Group.objects.get(pk=group).members.all()
+        	for user in usersInGroup:
+        		uid_list.add(int(user))
+
+        uid_list = User.objects.filter(pk__in=uid_list)	
+        if term:
+        	# Give recommendations using keyword
+        	categoryDislikes = set()
+        	for user in uid_list:
+        		user_prefs = eval(user.preferences)
+        		user_dislikes = [x for x in user_prefs if user_prefs[x] == -1]
+        		for category in user_dislikes:
+        			categoryDislikes.add(CATEGORY_DICT[category])
+
+        	categoryDislikeString = ','.join(categoryDislikes)
+        	print('Dislikes: {}'.format(categoryDislikeString))
+        	#dislikes = query_api(longitude, latitude, categories=categoryDislikeString)['businesses'] if categoryDislikeString else []
+        	dislikes = [x['name'] for x in query_api(longitude, latitude, categories=categoryDislikeString)['businesses']] if categoryDislikeString else []
+        	#likes = query_api(longitude, latitude, term)['businesses']
+        	likes = [x['name'] for x in query_api(longitude, latitude, term)['businesses']]
+        	print('Search term: {}'.format(term))
+        	dislikes = set(dislikes)
+        	dislikes = list(dislikes)
+        	semilikes = [x for x in dislikes if x in likes]
+        	for item in semilikes:
+        		likes.remove(item)
+        	others = [x for x in allRestaurants if x not in likes+semilikes+dislikes]
+        	dislikes = [x for x in dislikes if x not in semilikes]
+        else:
+        	# Give recommendations based on user preferences
+        	prefScores = dict()
+        	allDislikes, allLikes = set(), set()
+        	for user in uid_list:
+        		user_prefs = eval(user.preferences)
+        		for pref in user_prefs:
+        			if user_prefs[pref] == 1:
+        				prefScores[pref] = prefScores[pref] + 1 if pref in prefScores else 1
+        				allLikes.add(pref)
+        			elif user_prefs[pref] == -1:
+        				prefScores[pref] = prefScores[pref] - 1 if pref in prefScores else -1
+        				allDislikes.add(pref)
+
+        	user_likes = list()
+        	user_semilikes = list()
+        	user_dislikes = list()
+        	for pref in prefScores:
+        		score = prefScores[pref]
+        		if score == len(uid_list):
+        			user_likes.append(pref)
+        		elif score > 0:
+        			if pref in allDislikes:
+        				user_semilikes.append(pref)
+        			else:
+        				user_likes.append(pref)
+        		elif score < 0:
+        			user_dislikes.append(pref)
+        		else:
+        			if pref in allLikes:
+        				user_semilikes.append(pref)
+
+        	likeString = ','.join([CATEGORY_DICT[category] for category in user_likes])
+        	semilikeString = ','.join([CATEGORY_DICT[category] for category in user_semilikes])
+        	dislikeString = ','.join([CATEGORY_DICT[category] for category in user_dislikes])
+        	print('Likes: {}'.format(likeString))
+        	print('Semi-likes: {}'.format(semilikeString))
+        	print('Dislikes: {}'.format(dislikeString))
+        	semilikes = [x['name'] for x in query_api(longitude, latitude, categories=semilikeString)['businesses']] if semilikeString else []
+        	likes = [x['name'] for x in query_api(longitude, latitude, categories=likeString)['businesses'] if x['name'] not in semilikes]
+        	dislikes = [x['name'] for x in query_api(longitude, latitude, categories=dislikeString)['businesses'] if x['name'] not in likes+semilikes]
+        	others = [x for x in allRestaurants if x not in likes+semilikes+dislikes]
+        shuffle(likes)
+        shuffle(semilikes)
+        shuffle(others)
+        print(len(likes)+len(semilikes)+len(others)+len(dislikes))
+        return HttpResponse(json.dumps({'likes': likes, 'semilikes': semilikes, 'others': others, 'dislikes': dislikes}), content_type="application/json")
+
+        
+
 class login(APIView):
     """
     Login Endpoint
@@ -88,13 +193,13 @@ class login(APIView):
         	user = User.objects.get(username=username)
         	if user.check_password(password):
         		url = 'http://127.0.0.1:8000/api/users/{}'.format(user.id)
-        		response = requests.get(url).json()
+        		response = requests.get(url)
         	else:
         		response = json.dumps({'error': 'Invalid password!'})
         except User.DoesNotExist:
         	response = json.dumps({'error': 'User does not exist!'}) 
         
-        return Response(response, content_type="application/json")
+        return HttpResponse(response, content_type="application/json")
 
         
 def home(request):
@@ -102,88 +207,6 @@ def home(request):
 	context = {}	
 	return render(request, template, context)
 	
-
-def groupRecommendation(request, userList={1}, groupList=[1], latitude=7.0689124, longitude=125.6018725, term=None):
-	start_time = time.time()
-	#allRestaurants = query_api(longitude, latitude)['businesses']
-	allRestaurants = [x['name'] for x in query_api(longitude, latitude)['businesses']]
-	for group in groupList:
-		usersInGroup = Group.objects.get(pk=group).members.all()
-		for user in usersInGroup:
-			userList.add(int(user))
-
-	userList = User.objects.filter(pk__in=userList)	
-	if term:
-		# Give recommendations using keyword
-		categoryDislikes = set()
-		for user in userList:
-			user_prefs = eval(user.preferences)
-			user_dislikes = [x for x in user_prefs if user_prefs[x] == -1]
-			for category in user_dislikes:
-				categoryDislikes.add(CATEGORY_DICT[category])
-
-		categoryDislikeString = ','.join(categoryDislikes)
-		print('Dislikes: {}'.format(categoryDislikeString))
-		#dislikes = query_api(longitude, latitude, categories=categoryDislikeString)['businesses'] if categoryDislikeString else []
-		dislikes = [x['name'] for x in query_api(longitude, latitude, categories=categoryDislikeString)['businesses']] if categoryDislikeString else []
-		#likes = query_api(longitude, latitude, term)['businesses']
-		likes = [x['name'] for x in query_api(longitude, latitude, term)['businesses']]
-		print('Search term: {}'.format(term))
-		dislikes = set(dislikes)
-		dislikes = list(dislikes)
-		semilikes = [x for x in dislikes if x in likes]
-		for item in semilikes:
-			likes.remove(item)
-		others = [x for x in allRestaurants if x not in likes+semilikes+dislikes]
-		dislikes = [x for x in dislikes if x not in semilikes]
-	else:
-		# Give recommendations based on user preferences
-		prefScores = dict()
-		allDislikes, allLikes = set(), set()
-		for user in userList:
-			user_prefs = eval(user.preferences)
-			for pref in user_prefs:
-				if user_prefs[pref] == 1:
-					prefScores[pref] = prefScores[pref] + 1 if pref in prefScores else 1
-					allLikes.add(pref)
-				elif user_prefs[pref] == -1:
-					prefScores[pref] = prefScores[pref] - 1 if pref in prefScores else -1
-					allDislikes.add(pref)
-
-		user_likes = list()
-		user_semilikes = list()
-		user_dislikes = list()
-		for pref in prefScores:
-			score = prefScores[pref]
-			if score == len(userList):
-				user_likes.append(pref)
-			elif score > 0:
-				if pref in allDislikes:
-					user_semilikes.append(pref)
-				else:
-					user_likes.append(pref)
-			elif score < 0:
-				user_dislikes.append(pref)
-			else:
-				if pref in allLikes:
-					user_semilikes.append(pref)
-		
-		likeString = ','.join([CATEGORY_DICT[category] for category in user_likes])
-		semilikeString = ','.join([CATEGORY_DICT[category] for category in user_semilikes])
-		dislikeString = ','.join([CATEGORY_DICT[category] for category in user_dislikes])
-		print('Likes: {}'.format(likeString))
-		print('Semi-likes: {}'.format(semilikeString))
-		print('Dislikes: {}'.format(dislikeString))
-		semilikes = [x['name'] for x in query_api(longitude, latitude, categories=semilikeString)['businesses']] if semilikeString else []
-		likes = [x['name'] for x in query_api(longitude, latitude, categories=likeString)['businesses'] if x['name'] not in semilikes]
-		dislikes = [x['name'] for x in query_api(longitude, latitude, categories=dislikeString)['businesses'] if x['name'] not in likes+semilikes]
-		others = [x for x in allRestaurants if x not in likes+semilikes+dislikes]
-	shuffle(likes)
-	shuffle(semilikes)
-	shuffle(others)
-	print(len(likes)+len(semilikes)+len(others)+len(dislikes))
-	print("--- %s seconds ---" % (time.time() - start_time))
-	return HttpResponse(json.dumps({'likes': likes, 'semilikes': semilikes, 'others': others, 'dislikes': dislikes}), content_type="application/json")
 
 """
 Missing:

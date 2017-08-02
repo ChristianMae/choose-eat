@@ -1,14 +1,4 @@
 @font-face {
-    font-family: UniSansThick;
-    src: url(Uni_Sans_Heavy.otf);
-}
-
-@font-face {
-    font-family: UniSansThin;
-    src: url(Uni_Sans_Thin.otf);
-}
-
-@font-face {
     font-family: FreeStyleScript;
     src: url(Freestyle_Script.ttf);
 }
@@ -18,16 +8,8 @@
   font-weight: bold;
 }
 
-.logofont {
+.otherfont {
   font-family: 'Chewy', cursive;
-}
-
-.thickfont {
-	font-family: UniSansThick;
-}
-
-.thinfont {
-	font-family: UniSansThin;
 }
 
 .parallax-container {
