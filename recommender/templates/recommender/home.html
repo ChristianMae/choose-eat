@@ -1,23 +1,24 @@
 {% extends 'recommender/base.html' %}
 
+{% block title %}Choose-Eat | We Choose what you Eat!{% endblock title %}
+
 {% block headercard %}
 	<div class="row" style="position:relative;top:-48rem;">
     	    <div class="col l3"></div>
     	    <div class="col s12 l6">
-                      <div class="card white hoverable" style="height:150px;">
-                  	            <div class="card-content">
-                  	            <br/>
-    	                <form method="post" action="." style="z-index: 999;">
-	              	      {% csrf_token %}
+    	    	<div class="form-container">
+		            <form method="post" action="." style="z-index: 999;margin-left:60px;left:5px">
+	                    {% csrf_token %}
 	                    <div class="row">		                         
 	                        <div class="input-field">
-	                            <input type="text" class="col s6 m9 l8" id="id_keyword" name="keyword" placeholder="Food keyword here" maxlength="200" autocomplete=off required />
-	                            <input class="btn black waves-effect waves-light" type="submit" name="action" value="Submit" style="float:right;" /> 
+	                            <input type="text" class="col s6 m9 l8" id="id_term" name="term" placeholder="What are you looking to eat?" maxlength="200" autocomplete=off required />
+	                            <input type="hidden" id="id_latitude" name="latitude" value="0" />
+	                            <input type="hidden" id="id_longitude" name="longitude" value="0" />
+	                            <input class="btn black waves-effect waves-light tooltipped" type="submit" name="action" value="Submit" data-position="bottom" onClick="getLocations()" data-tooltip="Get better recommendations when you sign-up!" style="left:30px;top:10px;"/> 
 	                        </div>            
 	                    </div>
 	                </form>
 	            </div>
-	        </div>
     	    </div>
     	</div>    
 {% endblock %}

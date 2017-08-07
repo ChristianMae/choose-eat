@@ -18,7 +18,7 @@ from django.conf.urls import url, include
 from django.contrib import admin
 from rest_framework import routers, serializers, viewsets
 from rest_framework_swagger.views import get_swagger_view
-from recommender.views import soloRecommendation, groupRecommendation, login
+from recommender.views import soloRecommendation, groupRecommendation, anonRecommendation, login
 
 
 # Serializers define the API representation.
@@ -53,9 +53,10 @@ schema_view = get_swagger_view(title="Choose-Eat API")
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^api/', include(router.urls)),
-    url(r'^swagger/', schema_view),
+    url(r'^api-endpoints/', schema_view),
     url(r'^api/soloRecommendation', soloRecommendation.as_view()),
     url(r'^api/groupRecommendation', groupRecommendation.as_view()),
+    url(r'^api/anonRecommendation', anonRecommendation.as_view()),
     url(r'^api/login', login.as_view()),
     url(r'', include('recommender.urls', namespace='recommender')),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))

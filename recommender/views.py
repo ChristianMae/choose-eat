@@ -187,6 +187,31 @@ class groupRecommendation(APIView):
         return HttpResponse(json.dumps({'likes': likes, 'semilikes': semilikes, 'others': others, 'dislikes': dislikes}), content_type="application/json")
 
         
+class anonRecommendation(APIView):
+    """
+    Anonymous Restaurant Recommendation Endpoint
+
+    Parameters:
+    latitude (double) - Latitude of User's current location
+    longitude (double) - Longitude of User's current location
+    term (string) - Required search term
+    """
+    def get(self, request, format=None):
+        """
+        Returns restaurant recommendation based on anonymous user's given term
+        """
+        try:
+            latitude = float(self.request.query_params.get('latitude'))
+            longitude = float(self.request.query_params.get('longitude'))
+            term = self.request.query_params.get('term')
+        except:
+            return HttpResponse(json.dumps({'error': 'Error! Invalid parameters!'}), content_type="application/json")
+
+        allRestaurants = [x for x in query_api(longitude, latitude)['businesses']]
+        likes = query_api(longitude, latitude, term)['businesses']
+        others = [x for x in allRestaurants if x not in likes]
+        return HttpResponse(json.dumps({'likes': likes, 'others': others}), content_type="application/json")
+
 
 class login(APIView):
     """
@@ -217,9 +242,15 @@ class login(APIView):
 
         
 def home(request):
-	template = 'recommender/home.html'
-	context = {}	
-	return render(request, template, context)
+    template = 'recommender/home.html'
+    context = {}
+    if request.method == 'POST':
+        print(request.POST.get("latitude", 0))
+        print(request.POST.get("longitude", 0))
+    else:
+        template = 'recommender/home.html'
+        context = {}	
+    return render(request, template, context)
 	
 
 """
