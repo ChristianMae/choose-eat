@@ -1,13 +1,11 @@
 import json
-import time
 import requests
 from random import shuffle
 from django.http import HttpResponse
 from django.shortcuts import render
 from rest_framework.views import APIView
-from rest_framework.response import Response
 from users.models import User, Group
-from ceat.settings import CATEGORY_DICT
+from ceat.settings import CATEGORY_DICT, MY_URL
 from .utils import query_api
 
 
@@ -25,10 +23,13 @@ class soloRecommendation(APIView):
         """
         Returns restaurant recommendation based on user's preferences and location
         """
-        uid = int(self.request.query_params.get('uid'))
-        latitude = float(self.request.query_params.get('latitude'))
-        longitude = float(self.request.query_params.get('longitude'))
-        term = self.request.query_params.get('term')
+        try:
+        	uid = int(self.request.query_params.get('uid'))
+        	latitude = float(self.request.query_params.get('latitude'))
+        	longitude = float(self.request.query_params.get('longitude'))
+        	term = self.request.query_params.get('term')
+        except:
+        	return HttpResponse(json.dumps({'error': 'Error! Invalid parameters!'}), content_type="application/json")
 
         allRestaurants = [x['name'] for x in query_api(longitude, latitude)['businesses']]
         user = User.objects.get(pk=uid)
@@ -93,8 +94,8 @@ class groupRecommendation(APIView):
         except:
         	return HttpResponse(json.dumps({'error': 'Error! Invalid parameters!'}), content_type="application/json")
 
-        #allRestaurants = query_api(longitude, latitude)['businesses']
-        allRestaurants = [x['name'] for x in query_api(longitude, latitude)['businesses']]
+        allRestaurants = query_api(longitude, latitude)['businesses']
+        #allRestaurants = [x['name'] for x in query_api(longitude, latitude)['businesses']]
         for group in gid_list:
         	usersInGroup = Group.objects.get(pk=group).members.all()
         	for user in usersInGroup:
@@ -159,17 +160,30 @@ class groupRecommendation(APIView):
         	likeString = ','.join([CATEGORY_DICT[category] for category in user_likes])
         	semilikeString = ','.join([CATEGORY_DICT[category] for category in user_semilikes])
         	dislikeString = ','.join([CATEGORY_DICT[category] for category in user_dislikes])
-        	print('Likes: {}'.format(likeString))
-        	print('Semi-likes: {}'.format(semilikeString))
-        	print('Dislikes: {}'.format(dislikeString))
-        	semilikes = [x['name'] for x in query_api(longitude, latitude, categories=semilikeString)['businesses']] if semilikeString else []
-        	likes = [x['name'] for x in query_api(longitude, latitude, categories=likeString)['businesses'] if x['name'] not in semilikes]
-        	dislikes = [x['name'] for x in query_api(longitude, latitude, categories=dislikeString)['businesses'] if x['name'] not in likes+semilikes]
+        	#dislikes = [x['name'] for x in query_api(longitude, latitude, categories=dislikeString)['businesses']] if dislikeString else []
+        	dislikes = [x for x in query_api(longitude, latitude, categories=dislikeString)['businesses']] if dislikeString else []
+        	#semilikes = [x['name'] for x in query_api(longitude, latitude, categories=semilikeString)['businesses']] if semilikeString else []
+        	semilikes = [x for x in query_api(longitude, latitude, categories=semilikeString)['businesses']] if semilikeString else []
+        	#likes = [x['name'] for x in query_api(longitude, latitude, categories=likeString)['businesses']]
+        	likes = [x for x in query_api(longitude, latitude, categories=likeString)['businesses'] if x not in semilikes]
+
+        	tempList = []
+        	for item in dislikes:
+        		if item in likes:
+        			tempList.append(item)
+        	for item in tempList:
+        		likes.remove(item)
+        		dislikes.remove(item)
+        		if item not in semilikes:
+        			semilikes.append(item)
+
         	others = [x for x in allRestaurants if x not in likes+semilikes+dislikes]
         shuffle(likes)
         shuffle(semilikes)
         shuffle(others)
-        print(len(likes)+len(semilikes)+len(others)+len(dislikes))
+        print('Likes: {}'.format(likeString))
+        print('Dislikes: {}'.format(dislikeString))
+        print('Semilikes: {}'.format(semilikeString))
         return HttpResponse(json.dumps({'likes': likes, 'semilikes': semilikes, 'others': others, 'dislikes': dislikes}), content_type="application/json")
 
         
@@ -192,7 +206,7 @@ class login(APIView):
         try:
         	user = User.objects.get(username=username)
         	if user.check_password(password):
-        		url = 'http://127.0.0.1:8000/api/users/{}'.format(user.id)
+        		url = '{}/api/users/{}'.format(MY_URL, user.id)
         		response = requests.get(url)
         	else:
         		response = json.dumps({'error': 'Invalid password!'})

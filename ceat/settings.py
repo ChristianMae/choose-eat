@@ -139,6 +139,7 @@ STATICFILES_DIRS = [
 
 
 # Global
+MY_URL = 'http://127.0.0.1:8000' if DEBUG else 'http://ceat.herokuapp.com'
 with open(os.path.join(BASE_DIR, 'catAliases.txt')) as f:
     CATEGORY_DICT = eval(f.read())
 with open(os.path.join(BASE_DIR, 'defaultpref.txt')) as f:
