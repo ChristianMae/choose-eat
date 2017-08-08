@@ -59,5 +59,6 @@ urlpatterns = [
     url(r'^api/anonRecommendation', anonRecommendation.as_view()),
     url(r'^api/login', login.as_view()),
     url(r'', include('recommender.urls', namespace='recommender')),
+    url(r'', include('users.urls', namespace='users')),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]
