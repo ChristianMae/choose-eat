@@ -1,0 +1,15 @@
+{% extends 'users/base.html' %}
+
+{% block title %}Choose-Eat | Sign Up{% endblock title %}
+
+{% block header %}Sign Up{% endblock header %}
+
+{% block subtext %}Already have an account? <a href="{% url 'users:login' %}">Login</a>{% endblock subtext %}
+
+{% block content %}
+  <form action="/your-name/" method="post">
+    {% csrf_token %}
+    {{ form }}
+    <input type="submit" value="Submit" />
+  </form>
+{% endblock %}

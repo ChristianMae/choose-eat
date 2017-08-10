@@ -1,0 +1,37 @@
+{% extends 'users/base.html' %}
+
+{% block title %}Choose-Eat | Login{% endblock title %}
+
+{% block header %}Login{% endblock header %}
+
+{% block subtext %}Don't have an account? <a href="{% url 'users:register' %}">Sign up</a>{% endblock subtext %}
+
+{% block content %}
+  <ul>
+  	<li class="red-text">{{ form.non_field_errors }}</li>
+  	{% if form.username.errors or form.password.errors %}
+  	<li class="red-text">You left one or more field(s) blank</li>
+  	{% endif %}
+  </ul>
+
+  <form method="post" action="{% url 'users:login' %}">
+    {% csrf_token %}
+    <div class="row">
+      <div class="input-field col s12">
+          <input autofocus id="id_{{ form.username.name }}" name="{{ form.username.name }}" maxlength="150" type="text" placeholder="{{ form.username.label }}" >
+          <label for="id_{{ form.username.name }}">{{ form.username.label }}</label>
+          <small>{{ form.username.help_text }}</small> <br/>
+          <small class="red-text">{{ form.username.errors }}</small>
+      </div>
+    </div>
+    <div class="row">
+      <div class="input-field col s12">
+          <input id="id_{{ form.password.name }}" name="{{ form.password.name }}" type="password" placeholder="{{ form.password.label }}" >
+          <label for="id_{{ form.password.name }}">{{ form.password.label }}</label> <br/>
+          <small class="red-text">{{ form.password.errors }}</small>
+      </div>
+    </div>
+    <button class="btn black waves-effect waves-light" type="submit" name="action">Login</button>
+    <input type="hidden" name="next" value="{% url 'recommender:home' %}">
+  </form>
+{% endblock %}

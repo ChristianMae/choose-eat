@@ -19,8 +19,12 @@
 	      <div class="nav-wrapper">
 	        <a href="{% url 'recommender:home' %}" class="brand-logo logofontbold">Choose-Eat</a>
 	        <ul class="right hide-on-med-and-down">
-	          <li><a href="#connect" class="otherfont smtext">Login</a></li>
-	          <li><a href="#connect" class="otherfont smtext">Sign-up</a></li>
+	          {% if user.is_authenticated %}
+	          <li><a href="#" class="otherfont smtext">{{ user.username }}</a></li>
+	          {% else %}
+	          <li><a href="{% url 'users:login' %}" class="otherfont smtext">Login</a></li>
+	          <li><a href="{% url 'users:register' %}" class="otherfont smtext">Sign-up</a></li>
+	          {% endif %}
 	        </ul>
 	      </div>
 	    </div>

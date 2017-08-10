@@ -33,7 +33,18 @@
 }
 
 .form-container {
-  background-color: white;
+  background-color: rgba(0, 0, 0, 0.4);
   padding: 3px;
   border-radius: 25px;
+  color: white;
+}
+
+body {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
+
+main {
+  flex: 1 0 auto;
 }

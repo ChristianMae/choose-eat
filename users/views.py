@@ -44,3 +44,4 @@ def logout_view(request):
         return render(request, 'users/logout.html')
     else:
         return HttpResponseRedirect(reverse('recommender:home'))
+        
