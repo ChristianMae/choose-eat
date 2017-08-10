@@ -20,7 +20,14 @@
 	        <a href="{% url 'recommender:home' %}" class="brand-logo logofontbold">Choose-Eat</a>
 	        <ul class="right hide-on-med-and-down">
 	          {% if user.is_authenticated %}
-	          <li><a href="#" class="otherfont smtext">{{ user.username }}</a></li>
+	          <li><a href="#" class="dropdown-button otherfont smtext" data-activates='userMenu'>{{ user.username }}</a></li>
+
+	          <ul id='userMenu' class='dropdown-content' >
+			    <li><a href="#!" class="otherfont"><i class="tiny material-icons">person</i>Profile</a></li>
+			    <li><a href="#!" class="otherfont"><i class="tiny material-icons">settings</i>Settings</a></li>
+			    <li class="divider"></li>
+			    <li><a href="{% url 'users:logout' %}" class="otherfont"><i class="tiny material-icons">power_settings_new</i>Logout</a></li>
+			  </ul>
 	          {% else %}
 	          <li><a href="{% url 'users:login' %}" class="otherfont smtext">Login</a></li>
 	          <li><a href="{% url 'users:register' %}" class="otherfont smtext">Sign-up</a></li>

@@ -22,7 +22,7 @@ def register(request):
                 login(request, authenticated_user)
                 return HttpResponseRedirect(reverse('recommender:home'))
         else:
-            messages.error(request, 'You left one or more field(s) blank')
+            messages.error(request, 'You left one or more required field(s) blank')
             
     else:
         form = UserCreationForm()
@@ -41,7 +41,6 @@ def custom_login(request):
 def logout_view(request):
     if request.user.is_authenticated:
         logout(request)
-        return render(request, 'users/logout.html')
-    else:
-        return HttpResponseRedirect(reverse('recommender:home'))
+    
+    return HttpResponseRedirect(reverse('recommender:home'))
         

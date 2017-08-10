@@ -3,6 +3,78 @@
     src: url(Freestyle_Script.ttf);
 }
 
+/* label color */
+.input-field label {
+ color: #000000;
+}
+/* label focus color */
+.input-field input[type=text]:focus + label {
+ color: #000000;
+}
+/* label underline focus color */
+.input-field input[type=text]:focus {
+ border-bottom: 1px solid #000000;
+ box-shadow: 0 1px 0 0 #000000;
+}
+/* valid color */
+.input-field input[type=text].valid {
+ border-bottom: 1px solid #000000;
+ box-shadow: 0 1px 0 0 #000000;
+}
+/* invalid color */
+.input-field input[type=text].invalid {
+ border-bottom: 1px solid #000000;
+ box-shadow: 0 1px 0 0 #000000;
+}
+/* icon prefix focus color */
+.input-field .prefix.active {
+ color: #000000;
+}
+
+.dropdown-content {
+  background-color: rgba(0, 0, 0, 0);
+  margin: 0;
+  display: none;
+  min-width: 100px;
+  max-height: 650px;
+  overflow-y: auto;
+  opacity: 0;
+  position: absolute;
+  z-index: 999;
+  will-change: width, height;
+}
+
+.dropdown-content li {
+  clear: both;
+  background-color: rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+  min-height: 50px;
+  line-height: 1.5rem;
+  width: 100%;
+  text-align: left;
+  text-transform: none;
+}
+
+.dropdown-content li > a > i {
+  height: inherit;
+  line-height: inherit;
+  float: left;
+  margin: 0 15px 0 0;
+  width: 15px;
+}
+
+.dropdown-content li:hover, .dropdown-content li.active, .dropdown-content li.selected {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.dropdown-content li > a, .dropdown-content li > span {
+  font-size: 16px;
+  color: white;
+  display: block;
+  line-height: 22px;
+  padding: 12px 14px;
+}
+
 .logofontbold {
   font-family: FreeStyleScript;
   font-weight: bold;
@@ -48,3 +120,4 @@ body {
 main {
   flex: 1 0 auto;
 }
+
