@@ -36,13 +36,6 @@ var options = [
 ];
 Materialize.scrollFire(options);
 
-$('a[href*=#]').click(function(event){
-    $('html, body').animate({
-        scrollTop: $( $.attr(this, 'href') ).offset().top-100
-    }, 500);
-   event.preventDefault();
- });
-
  $('.dropdown-button').dropdown({
       inDuration: 300,
       outDuration: 225,

@@ -1,0 +1,83 @@
+{% extends 'recommender/base.html' %}
+
+{% block mobile-menu %}
+<li><div class="user-view">
+  <div class="background grey darken-4">
+  </div>
+  <a href="#!user"><img class="circle" src="images/yuna.jpg"></a>
+  <a href="#!name"><span class="white-text name">{{ user.first_name }} {{ user.last_name }}</span></a>
+  <a href="#"><span class="white-text email">({{ user.username }})</span></a>
+</div></li>
+<li><a href="#!" class="waves-effect"><i class="tiny material-icons">person</i>My Profile</a></li>
+<li><a href="#!" class="waves-effect"><i class="tiny material-icons">settings</i>Account Settings</a></li>
+<li><div class="divider"></div></li>
+<li><a href="{% url 'users:logout' %}" class="waves-effect"><i class="tiny material-icons">power_settings_new</i>Logout</a></li>
+{% endblock mobile-menu %}
+
+{% block headercard %}
+<div class="row show-on-small-only" style="position:relative;top:-68rem;">
+  <div class="col l3"></div>
+  <div class="col s12 l6">
+    <div class="form-container center-align" style="padding-bottom: 20px;">
+      <br />
+      <a class="waves-effect waves-light btn-large black" style="width: 175px;"><i class="material-icons left">cloud</i>Solo</a>
+      <h3 class="otherfont shadowed">OR</h3>
+	  <a class="waves-effect waves-light btn-large black" style="width: 175px;"><i class="material-icons left">cloud</i>Group</a>
+      <br />
+    </div>
+  </div>
+</div>
+
+<div class="row hide-on-med-and-down" style="position:relative;top:-55rem;">
+  <div class="col l3"></div>
+  <div class="col s12 l6">
+    <div class="form-container center-align" style="padding-bottom: 20px;">
+      <br />
+      <a class="waves-effect waves-light btn-large black" style="width: 175px;"><i class="material-icons left">cloud</i>Solo</a>
+      <h3 class="otherfont shadowed">OR</h3>
+	  <a class="waves-effect waves-light btn-large black" style="width: 175px;"><i class="material-icons left">cloud</i>Group</a>
+      <br />
+    </div>
+  </div>
+</div>    
+{% endblock %}
+
+{% block menu %}
+<li><a href="#" class="dropdown-button otherfont smtext" data-activates='userMenu'>{{ user.username }}</a></li>
+
+<ul id='userMenu' class='dropdown-content' >
+  <li><a href="#!" class="otherfont"><i class="tiny material-icons">person</i>Profile</a></li>
+  <li><a href="#!" class="otherfont"><i class="tiny material-icons">settings</i>Settings</a></li>
+  <li class="divider"></li>
+  <li><a href="{% url 'users:logout' %}" class="otherfont"><i class="tiny material-icons">power_settings_new</i>Logout</a></li>
+</ul>
+{% endblock %}
+
+{% block content %}
+<ul id="about-items">
+  <li style="opacity:0;"><h2 class="header otherfont">About</h2></li>
+  <li style="opacity:0;"><p class="black-text" style="max-width: 1000px; word-wrap: break-word;">
+    <i>dock</i> &emsp;|&emsp;/däk/&emsp;|&emsp;verb&emsp;|<br/> - to cut short <br/> - to take away a part of
+	<br />
+	<small>(From <a href="https://www.merriam-webster.com/dictionary/dock">Merriam-Webster's 3rd definition</a>)</small>
+	<br /><br />
+	<b><i>Dock</i> is basically yet another URL shortener, similar to <a href="https://bitly.com/">Bitly</a>.
+	<br /><br />
+	Turn a long URL like this:
+	<br />
+	https://www.youtube.com/watch?v=QslJYDX3o8s&amp;list=PLBDeA3o056yyMUiRG3xCXaSDan_bGG-Ho
+	<br /><br />
+	Into something like this:
+	<br />
+	http://dockr.herokuapp.com/a5dfmp
+	<br /><br />
+	This way, links are more manageable, easier to share, and kept secret. 
+	<br />
+	Dock is a school project, made with the use of <a href="https://www.djangoproject.com/">Django</a> and <a href="http://materializecss.com/">MaterializeCSS</a>.</b>
+  </p></li>
+</ul>
+{% endblock content %}
+
+{% block javascript %}
+{% endblock %}
+

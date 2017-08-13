@@ -14,36 +14,28 @@
 
 <body>
 	<header>
-	  <nav class="black">
+	  <nav class="top-nav black">
         <div class="nav-wrapper">
           <a href="{% url 'recommender:home' %}" class="brand-logo center logofontbold">Choose-Eat</a>
           <ul id="nav-mobile" class="left hide-on-med-and-down">
           </ul>
         </div>
       </nav>
+
+      <div class="container"><a href="#" data-activates="nav-mobile" class="button-collapse top-nav full hide-on-large-only"><i class="material-icons">menu</i></a></div>
 	</header>
 
-	<main>
-	  <div class="container">
+	<main>	    
+      <div class="container">
 	    <div class="row">
-	    	<div class="col m3 l6">
-	  		</div>
-	  		<div class="col s12 m6 l6">
+	  		<div class="col s12">
 	  		  <h2 class="otherfont">{% block header %}{% endblock %}</h2>
-	  		  <p class="bold">{% block subtext %}{% endblock %}</p>
 	  		</div>
 	  	</div>
 	  	<div class="row">
-	  		<div class="col m3 hide-on-large-only">
-	  		</div>
-	  		<div class="col l6 hide-on-med-and-down">
-	  		image here
-	  		</div>
-	  		<div class="col s12 m6 l6">
-	  		  {% block content %}{% endblock %}
-	  		</div>
+	  		{% block content %}{% endblock %}
 	  	</div>
-	   </div>
+      </div>
     </main>
 
     <footer class="page-footer grey darken-4" id="connect">
@@ -74,6 +66,7 @@
 
 	<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.1/js/materialize.min.js"></script>
-    <script src="{% static 'recommender/scripts.js' %}"></script>    
+    <script src="{% static 'recommender/scripts.js' %}"></script>
+    {% block javascript %}{% endblock %}    
 </body>
 </html>

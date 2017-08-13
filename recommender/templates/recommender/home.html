@@ -1,25 +1,64 @@
 {% extends 'recommender/base.html' %}
 
-{% block title %}Choose-Eat | We Choose what you Eat!{% endblock title %}
+{% block mobile-menu %}
+<div class="row grey darken-4 white-text center-align">
+  <br />
+  <h5 class="otherfont"><b>Welcome!</b></h5>
+  <br />
+</div>
+<div class="row grey lighten-3">
+  <li><a href="{% url 'users:login' %}">Login</a></li>
+  <li><a href="{% url 'users:register' %}">Register</a></li>
+</div>
+{% endblock mobile-menu %}
+
+{% block menu %}
+<li><a href="{% url 'users:login' %}" class="otherfont smtext">Login</a></li>
+<li><a href="{% url 'users:register' %}" class="otherfont smtext">Sign-up</a></li>
+{% endblock menu %}
+
+{% block content %}
+<ul id="about-items">
+  <li style="opacity:0;"><h2 class="header otherfont">About</h2></li>
+  <li style="opacity:0;"><p class="black-text" style="max-width: 1000px; word-wrap: break-word;">
+    <i>dock</i> &emsp;|&emsp;/däk/&emsp;|&emsp;verb&emsp;|<br/> - to cut short <br/> - to take away a part of
+	<br />
+	<small>(From <a href="https://www.merriam-webster.com/dictionary/dock">Merriam-Webster's 3rd definition</a>)</small>
+	<br /><br />
+	<b><i>Dock</i> is basically yet another URL shortener, similar to <a href="https://bitly.com/">Bitly</a>.
+	<br /><br />
+	Turn a long URL like this:
+	<br />
+	https://www.youtube.com/watch?v=QslJYDX3o8s&amp;list=PLBDeA3o056yyMUiRG3xCXaSDan_bGG-Ho
+	<br /><br />
+	Into something like this:
+	<br />
+	http://dockr.herokuapp.com/a5dfmp
+	<br /><br />
+	This way, links are more manageable, easier to share, and kept secret. 
+	<br />
+	Dock is a school project, made with the use of <a href="https://www.djangoproject.com/">Django</a> and <a href="http://materializecss.com/">MaterializeCSS</a>.</b>
+  </p></li>
+</ul>
+{% endblock content %}
 
 {% block headercard %}
-	<div class="row" style="position:relative;top:-48rem;">
-    	    <div class="col l3"></div>
-    	    <div class="col s12 l6">
-    	    	<div class="form-container">
-		            <form method="post" action="." style="z-index: 999;margin-left:60px;left:5px">
-	                    {% csrf_token %}
-	                    <div class="row">		                         
-	                        <div class="input-field">
-	                            <input type="text" class="col s6 m9 l8" id="id_term" name="term" placeholder="What are you looking to eat?" maxlength="200" autocomplete=off required />
-	                            <input type="hidden" id="id_latitude" name="latitude" value="0" />
-	                            <input type="hidden" id="id_longitude" name="longitude" value="0" />
-	                            <input class="btn black waves-effect waves-light tooltipped" type="submit" name="action" value="Submit" data-position="bottom" onClick="getLocations()" data-tooltip="Get better recommendations when you sign-up!" style="left:30px;top:10px;"/> 
-	                        </div>            
-	                    </div>
-	                </form>
-	            </div>
-    	    </div>
-    	</div>    
+<div class="row" style="position:relative;top:-48rem;">
+  <div class="col l3"></div>
+  <div class="col s12 l6">
+    <div class="form-container">
+      <form method="post" action="." style="z-index: 999;margin-left:60px;left:5px">
+        {% csrf_token %}
+        <div class="row">		                         
+          <div class="input-field">
+            <input type="text" class="col s6 m9 l8" id="id_term" name="term" placeholder="What are you looking to eat?" maxlength="200" autocomplete=off required />
+            <input type="hidden" id="id_latitude" name="latitude" value="0" />
+            <input type="hidden" id="id_longitude" name="longitude" value="0" />
+            <input class="btn black waves-effect waves-light tooltipped" type="submit" name="action" value="Submit" data-position="bottom" onClick="getLocations()" data-tooltip="Get better recommendations when you sign-up!" style="left:30px;top:10px;"/> 
+          </div>            
+        </div>
+     </form>
+    </div>
+  </div>
+</div>    
 {% endblock %}
-
