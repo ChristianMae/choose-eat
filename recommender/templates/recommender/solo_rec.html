@@ -35,6 +35,7 @@
 
 <div class="row" id="loading">
   <div class="col s12 center">
+    <br /><br />
     <div class="preloader-wrapper big active">
       <div class="spinner-layer spinner-red-only center-align">
         <div class="circle-clipper left">
@@ -52,12 +53,12 @@
 
 <div class="row" id="results">
   <div class="col s12 center">
-    <a id="resto-link" href="https://www.yelp.com/biz/gangnam-cafe-and-restaurant-davao-city?adjust_creative=3cv0O5-XwPzYS4PO3GSoEw&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=3cv0O5-XwPzYS4PO3GSoEw"><img id="resto-img" class="z-depth-4" style="border: 3px solid black; height:250px;width:350px; border-radius: 35%;" src="https://s3-media1.fl.yelpcdn.com/bphoto/se2zV5ZiKd9PHZNUMyUyKQ/o.jpg"/></a>
-    <h4 id="resto-name" class="otherfont">Gangnam Cafe And Restaurant</h3>
-    <p id="resto-address">MacArthur Highway, Karpentrade Building</p>
-    <span class="center-align"><small id="resto-distance">Approx. 8.9 km away</small> | <small id="resto-categories">Korean, Asian Fusion</small></span><br /><br />
-    <a class="btn-floating btn-large waves-effect waves-light red"><i class="material-icons">not_interested</i></a>
-    <a class="btn-floating btn-large waves-effect waves-light blue"><i class="material-icons">replay</i></a>
+    <a id="resto-link" href=""><img id="resto-img" class="z-depth-4" style="border: 3px solid black; height:250px;width:350px; border-radius: 35%;" src=""/></a>
+    <h4 id="resto-name" class="otherfont"></h3>
+    <p id="resto-address"></p>
+    <span class="center-align"><small id="resto-distance"></small> | <small id="resto-categories"></small></span><br /><br />
+    <a class="btn-floating btn-large waves-effect waves-light red" href="javascript:nextResto();"><i class="material-icons">not_interested</i></a>
+    <a class="btn-floating btn-large waves-effect waves-light blue" href="javascript:previousResto();"><i class="material-icons">replay</i></a>
     <a class="btn-floating btn-large waves-effect waves-light green"><i class="material-icons">check</i></a>
   </div>
 </div>
@@ -65,6 +66,10 @@
 
 {% block javascript %}
 <script>
+var index = 0;
+var restoList = {};
+var subtext = document.getElementById('subtext'); 
+
 $(document).ready(function(){
     getLocation();
     $('#loading').hide();
@@ -79,8 +84,8 @@ $('#keyword_rec').on('submit', function(event){
       type: 'GET',
       url: '{% url 'soloRec' %}',
       data: {
-        latitude: 7.0689124,
-        longitude: 125.6018725,
+        latitude: document.getElementById('id_latitude').innerHTML,
+        longitude: document.getElementById('id_longitude').innerHTML,
         uid: {{ user.id }},
         term: $('#id_term').val()
       },
@@ -99,24 +104,10 @@ $('#keyword_rec').on('submit', function(event){
         $('#loading').hide();
       },
       success: function(response) {
-        var subtext = document.getElementById('subtext'); 
-        if (response.likes.length > 0) {
-          index = 0;
-          subtext.innerHTML = "You'll surely love these!";
-
-          var categories = [];
-          for (var i = 0; i < response.likes[0].categories.length; i++) {
-            categories.push(response.likes[0].categories[i].title);
-          }
-          var address = response.likes[0].location.address2 === '' || response.likes[0].location.address2 === null ? response.likes[0].location.address1 : response.likes[0].location.address1+', '+response.likes[0].location.address2;
-
-          document.getElementById('resto-link').href = response.likes[0].url;
-          document.getElementById('resto-img').src = response.likes[0].image_url;
-          document.getElementById('resto-name').innerHTML = response.likes[0].name;
-          document.getElementById('resto-address').innerHTML = address;
-          document.getElementById('resto-distance').innerHTML = 'Approx. '+(response.likes[0].distance/1000).toFixed(1)+' km away';
-          document.getElementById('resto-categories').innerHTML = categories.join(', ');
-        }
+        console.log(response);
+        restoList = response;
+        console.log(restoList);
+        nextResto();
         $('#results').show();
       }
     })
@@ -142,6 +133,59 @@ function getLocation() {
     });
   } else { 
     alert("Geolocation is not supported by this browser :( Try using a different browser or get the mobile app!");
+  }
+}
+
+function nextResto() {
+  var actualIndex = 0;
+  var resultList;
+
+  if (index < restoList.likes.length) {
+    actualIndex = index;
+    resultList = restoList.likes;
+    subtext.innerHTML = "You'll surely love these!"
+  } else if (index-restoList.likes.length < restoList.semilikes.length) {
+    actualIndex = index-restoList.likes.length;
+    resultList = restoList.semilikes;
+    subtext.innerHTML = "You'll probably like these too!"
+  } else if (index-restoList.likes.length-restoList.semilikes.length < restoList.others.length) {
+    actualIndex = index-restoList.likes.length-restoList.semilikes.length;
+    resultList = restoList.others;
+    subtext.innerHTML = "Try these ones out!"
+  } else if (index-restoList.likes.length-restoList.semilikes.length-restoList.others.length < restoList.dislikes.length) {
+    actualIndex = index-restoList.likes.length-restoList.semilikes.length-restoList.others.length;
+    resultList = restoList.dislikes;
+    subtext.innerHTML = "Not too sure about these ones..."
+  } else {
+    index = 0;
+    actualIndex = 0;
+    resultList = restoList.likes;
+    subtext.innerHTML = "That was all of them! Back to start!"
+  }
+
+  console.log('index: ' +index+ ' | actual: ' +actualIndex+ ' | over: ' +resultList.length+ ' | current: ' +resultList[actualIndex].name);
+  var categories = [];
+  for (var i = 0; i < resultList[actualIndex].categories.length; i++) {
+    categories.push(resultList[actualIndex].categories[i].title);
+  }
+  var address = resultList[actualIndex].location.address2 === '' || resultList[actualIndex].location.address2 === null ? resultList[actualIndex].location.address1 : resultList[actualIndex].location.address1+', '+resultList[actualIndex].location.address2;
+
+  document.getElementById('resto-link').href = resultList[actualIndex].url;
+  document.getElementById('resto-img').src = resultList[actualIndex].image_url;
+  document.getElementById('resto-name').innerHTML = resultList[actualIndex].name;
+  document.getElementById('resto-address').innerHTML = address;
+  document.getElementById('resto-distance').innerHTML = 'Approx. '+(resultList[actualIndex].distance/1000).toFixed(1)+' km away';
+  document.getElementById('resto-categories').innerHTML = categories.join(', ');
+
+  index++;
+}
+
+function previousResto() {
+  if (index > 0) {
+    index = index-2 < 0 ? 0 : index-2;
+    nextResto();
+  } else {
+    Materialize.toast('We are just getting started!', 3000, 'rounded');
   }
 }
 </script>

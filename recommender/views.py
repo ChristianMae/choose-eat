@@ -244,10 +244,6 @@ class login(APIView):
 def home(request):
     template = 'recommender/home_in.html' if request.user.is_authenticated else 'recommender/home.html'
     context = {}
-    
-    if request.method == 'POST':
-        print(request.POST.get("latitude", 0))
-        print(request.POST.get("longitude", 0))
 
     return render(request, template, context)
 
