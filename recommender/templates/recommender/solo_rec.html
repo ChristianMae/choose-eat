@@ -1,0 +1,149 @@
+{% extends 'recommender/base_rec.html' %}
+
+{% block title %}Choose-Eat | Solo{% endblock title %}
+
+{% block header %}Solo Recommendation{% endblock header %}
+{% block header_small %}Solo Recommendation{% endblock header_small %}
+
+{% block content %}
+<div class="row" id="pre-recommendation">
+  <div class="container">
+    <div class="col s12 m5 l5 center-align">
+      <form id="keyword_rec">
+        {% csrf_token %}
+        <div class="row">
+          <div class="input-field col s12">
+              <input id="id_term" name="term" maxlength="24" type="text" placeholder="What are you looking to eat?" required>
+              <small>Want to eat something specific? Could be some good 'chicken', or a delicious bowl of 'ramen' perhaps?</small> <br/>
+          </div>
+        </div>
+        <button class="btn black waves-effect waves-light otherfont" type="submit" name="action">Submit</button>
+      </form>
+    </div>
+    <div class="col s12 m2 l2">
+      <h3 class="otherfont center-align">OR</h3>
+    </div>
+    <div class="col s12 m5 l5 center-align">
+      <a class="waves-effect waves-light btn-large black otherfont pulse" href="{% url 'recommender:solo' %}" style="margin-top: 6px;"><i class="material-icons left">restaurant_menu</i>Dazzle Me!</a>
+      <br /><br />
+      <small>Not really looking for anything specific, but just want awesome food that'll match your taste? Leave it to us!</small> <br/>
+    </div>
+    <p class="white-text" id="id_latitude"></pre>
+    <p class="white-text" id="id_longitude"></pre>
+  </div>
+</div>
+
+<div class="row" id="loading">
+  <div class="col s12 center">
+    <div class="preloader-wrapper big active">
+      <div class="spinner-layer spinner-red-only center-align">
+        <div class="circle-clipper left">
+          <div class="circle"></div>
+        </div><div class="gap-patch">
+          <div class="circle"></div>
+        </div><div class="circle-clipper right">
+          <div class="circle"></div>
+        </div>
+      </div>
+    </div>
+    <h5 class="otherfont" id="loadingtxt">Fetching results...</h4>
+  </div>
+</div>
+
+<div class="row" id="results">
+  <div class="col s12 center">
+    <a id="resto-link" href="https://www.yelp.com/biz/gangnam-cafe-and-restaurant-davao-city?adjust_creative=3cv0O5-XwPzYS4PO3GSoEw&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=3cv0O5-XwPzYS4PO3GSoEw"><img id="resto-img" class="z-depth-4" style="border: 3px solid black; height:250px;width:350px; border-radius: 35%;" src="https://s3-media1.fl.yelpcdn.com/bphoto/se2zV5ZiKd9PHZNUMyUyKQ/o.jpg"/></a>
+    <h4 id="resto-name" class="otherfont">Gangnam Cafe And Restaurant</h3>
+    <p id="resto-address">MacArthur Highway, Karpentrade Building</p>
+    <span class="center-align"><small id="resto-distance">Approx. 8.9 km away</small> | <small id="resto-categories">Korean, Asian Fusion</small></span><br /><br />
+    <a class="btn-floating btn-large waves-effect waves-light red"><i class="material-icons">not_interested</i></a>
+    <a class="btn-floating btn-large waves-effect waves-light blue"><i class="material-icons">replay</i></a>
+    <a class="btn-floating btn-large waves-effect waves-light green"><i class="material-icons">check</i></a>
+  </div>
+</div>
+{% endblock content %}
+
+{% block javascript %}
+<script>
+$(document).ready(function(){
+    getLocation();
+    $('#loading').hide();
+    $('#results').hide();
+});
+
+$('#keyword_rec').on('submit', function(event){
+    event.preventDefault();
+    console.log("form submitted!");
+
+    $.ajax({
+      type: 'GET',
+      url: '{% url 'soloRec' %}',
+      data: {
+        latitude: 7.0689124,
+        longitude: 125.6018725,
+        uid: {{ user.id }},
+        term: $('#id_term').val()
+      },
+      beforeSend: function() {
+        $('#pre-recommendation').hide();
+        $('#loading').show();
+        var x = document.getElementById('loadingtxt'), 
+        messages = ['Anytime now...', 'This is taking longer than expected...'],
+        i = 0;
+        setInterval(function () {
+          x.innerHTML = messages[i++];
+          i = messages.length === i ? 0 : i;
+        }, 5000);
+      },
+      complete: function(response) {
+        $('#loading').hide();
+      },
+      success: function(response) {
+        var subtext = document.getElementById('subtext'); 
+        if (response.likes.length > 0) {
+          index = 0;
+          subtext.innerHTML = "You'll surely love these!";
+
+          var categories = [];
+          for (var i = 0; i < response.likes[0].categories.length; i++) {
+            categories.push(response.likes[0].categories[i].title);
+          }
+          var address = response.likes[0].location.address2 === '' || response.likes[0].location.address2 === null ? response.likes[0].location.address1 : response.likes[0].location.address1+', '+response.likes[0].location.address2;
+
+          document.getElementById('resto-link').href = response.likes[0].url;
+          document.getElementById('resto-img').src = response.likes[0].image_url;
+          document.getElementById('resto-name').innerHTML = response.likes[0].name;
+          document.getElementById('resto-address').innerHTML = address;
+          document.getElementById('resto-distance').innerHTML = 'Approx. '+(response.likes[0].distance/1000).toFixed(1)+' km away';
+          document.getElementById('resto-categories').innerHTML = categories.join(', ');
+        }
+        $('#results').show();
+      }
+    })
+});
+$(".button-collapse").sideNav();
+$('.dropdown-button').dropdown({
+    inDuration: 300,
+    outDuration: 225,
+    constrainWidth: true, // Does not change width of dropdown to that of the activator
+    hover: true, // Activate on hover
+    gutter: 0, // Spacing from edge
+    belowOrigin: true, // Displays dropdown below the button
+    alignment: 'left', // Displays dropdown with edge aligned to the left of button
+    stopPropagation: false // Stops event propagation
+  }
+);
+
+function getLocation() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function(position) {
+      document.getElementById("id_latitude").innerHTML = '' +position.coords.latitude;
+      document.getElementById("id_longitude").innerHTML = '' +position.coords.longitude;
+    });
+  } else { 
+    alert("Geolocation is not supported by this browser :( Try using a different browser or get the mobile app!");
+  }
+}
+</script>
+{% endblock %}
+

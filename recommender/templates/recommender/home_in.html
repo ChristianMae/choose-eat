@@ -8,21 +8,45 @@
   <a href="#!name"><span class="white-text name">{{ user.first_name }} {{ user.last_name }}</span></a>
   <a href="#"><span class="white-text email">({{ user.username }})</span></a>
 </div></li>
-<li><a href="#!" class="waves-effect"><i class="tiny material-icons">person</i>My Profile</a></li>
+<li><ul class="collapsible collapsible-accordion" style="margin-left:16px;">
+  <li><a href="#!" class="waves-effect collapsible-header"><i class="tiny material-icons">restaurant</i>Get recommendations</a>
+    <div class="collapsible-body">
+      <ul>
+        <li><a href="{% url 'recommender:solo' %}">Solo</a></li>
+        <li><a href="{% url 'recommender:group' %}">Group</a></li>
+      </ul>
+    </div>
+  </li>
+</ul></li>
+<li><div class="divider"></div></li>
+<li><a href="#!" class="waves-effect"><i class="tiny material-icons">account_circle</i>My Profile</a></li>
 <li><a href="#!" class="waves-effect"><i class="tiny material-icons">settings</i>Account Settings</a></li>
 <li><div class="divider"></div></li>
 <li><a href="{% url 'users:logout' %}" class="waves-effect"><i class="tiny material-icons">power_settings_new</i>Logout</a></li>
 {% endblock mobile-menu %}
 
 {% block headercard %}
-<div class="row show-on-small-only" style="position:relative;top:-68rem;">
+<div class="row hide-on-med-and-up" style="position:relative;top:-68rem;">
   <div class="col l3"></div>
   <div class="col s12 l6">
     <div class="form-container center-align" style="padding-bottom: 20px;">
       <br />
-      <a class="waves-effect waves-light btn-large black" style="width: 175px;"><i class="material-icons left">cloud</i>Solo</a>
+      <a class="waves-effect waves-light btn-large black" style="width: 175px;" href="{% url 'recommender:solo' %}"><i class="material-icons left">person</i>Solo</a>
       <h3 class="otherfont shadowed">OR</h3>
-	  <a class="waves-effect waves-light btn-large black" style="width: 175px;"><i class="material-icons left">cloud</i>Group</a>
+	  <a class="waves-effect waves-light btn-large black" style="width: 175px;" href="{% url 'recommender:group' %}"><i class="material-icons left">group</i>Group</a>
+      <br />
+    </div>
+  </div>
+</div>
+
+<div class="row hide-on-small-only hide-on-large-only" style="position:relative;top:-60rem;">
+  <div class="col l3"></div>
+  <div class="col s12 l6">
+    <div class="form-container center-align" style="padding-bottom: 20px;">
+      <br />
+      <a class="waves-effect waves-light btn-large black" style="width: 175px;" href="{% url 'recommender:solo' %}"><i class="material-icons left">person</i>Solo</a>
+      <h3 class="otherfont shadowed">OR</h3>
+	  <a class="waves-effect waves-light btn-large black" style="width: 175px;" href="{% url 'recommender:group' %}"><i class="material-icons left">group</i>Group</a>
       <br />
     </div>
   </div>
@@ -33,9 +57,9 @@
   <div class="col s12 l6">
     <div class="form-container center-align" style="padding-bottom: 20px;">
       <br />
-      <a class="waves-effect waves-light btn-large black" style="width: 175px;"><i class="material-icons left">cloud</i>Solo</a>
+      <a class="waves-effect waves-light btn-large black" style="width: 175px;" href="{% url 'recommender:solo' %}"><i class="material-icons left">person</i>Solo</a>
       <h3 class="otherfont shadowed">OR</h3>
-	  <a class="waves-effect waves-light btn-large black" style="width: 175px;"><i class="material-icons left">cloud</i>Group</a>
+	  <a class="waves-effect waves-light btn-large black" style="width: 175px;" href="{% url 'recommender:group' %}"><i class="material-icons left">group</i>Group</a>
       <br />
     </div>
   </div>

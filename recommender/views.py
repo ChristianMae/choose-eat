@@ -1,7 +1,8 @@
 import json
-import requests
 from random import shuffle
-from django.http import HttpResponse
+import requests
+from django.core.urlresolvers import reverse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from rest_framework.views import APIView
 from users.models import User, Group
@@ -29,9 +30,9 @@ class soloRecommendation(APIView):
         	longitude = float(self.request.query_params.get('longitude'))
         	term = self.request.query_params.get('term')
         except:
-        	return HttpResponse(json.dumps({'error': 'Error! Invalid parameters!'}), content_type="application/json")
+            return HttpResponse(json.dumps({'error': 'Error! Invalid parameters!'}), content_type="application/json")
 
-        allRestaurants = [x['name'] for x in query_api(longitude, latitude)['businesses']]
+        allRestaurants = [x for x in query_api(longitude, latitude)['businesses']]
         user = User.objects.get(pk=uid)
         user_prefs = eval(user.preferences)
         user_dislikes = [x for x in user_prefs if user_prefs[x] == -1]
@@ -40,12 +41,12 @@ class soloRecommendation(APIView):
         	categoryDislikes.append(CATEGORY_DICT[category])
         categoryDislikeString = ','.join(categoryDislikes)
         print('Dislikes: {}'.format(categoryDislikeString))
-        #dislikes = query_api(longitude, latitude, categories=categoryDislikeString)['businesses'] if categoryDislikeString else []
-        dislikes = [x['name'] for x in query_api(longitude, latitude, categories=categoryDislikeString)['businesses']] if categoryDislikeString else []
+        dislikes = query_api(longitude, latitude, categories=categoryDislikeString)['businesses'] if categoryDislikeString else []
+        #dislikes = [x['name'] for x in query_api(longitude, latitude, categories=categoryDislikeString)['businesses']] if categoryDislikeString else []
         if term:
         	# Give recommendations using keyword
-        	#likes = query_api(longitude, latitude, term)['businesses']
-        	likes = [x['name'] for x in query_api(longitude, latitude, term)['businesses']]
+        	likes = query_api(longitude, latitude, term)['businesses']
+        	#likes = [x['name'] for x in query_api(longitude, latitude, term)['businesses']]
         	print('Search term: {}'.format(term))	
         else:
         	# Give recommendations based on user preferences
@@ -55,10 +56,9 @@ class soloRecommendation(APIView):
         		categoryLikes.append(CATEGORY_DICT[category])
         	categoryLikeString = ','.join(categoryLikes)
         	print('Likes: {}'.format(categoryLikeString))
-        	#likes = query_api(longitude, latitude, categories=categoryLikeString)['businesses']
-        	likes = [x['name'] for x in query_api(longitude, latitude, categories=categoryLikeString)['businesses']]
-        dislikes = set(dislikes)
-        dislikes = list(dislikes)
+        	likes = query_api(longitude, latitude, categories=categoryLikeString)['businesses']
+        	#likes = [x['name'] for x in query_api(longitude, latitude, categories=categoryLikeString)['businesses']]
+
         semilikes = [x for x in dislikes if x in likes]
         for item in semilikes:
         	likes.remove(item)
@@ -250,7 +250,27 @@ def home(request):
         print(request.POST.get("longitude", 0))
 
     return render(request, template, context)
+
+
+def soloRec_page(request):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse('recommender:home'))
+
+    template = 'recommender/solo_rec.html'
+    context = {}
+
+    return render(request, template, context)
 	
+
+def groupRec_page(request):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse('recommender:home'))
+
+    template = 'recommender/group_rec.html'
+    context = {}
+
+    return render(request, template, context)
+
 
 """
 Missing:
