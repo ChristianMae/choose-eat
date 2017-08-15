@@ -16,6 +16,7 @@ class soloRecommendation(APIView):
 
     Parameters:
     uid (int) - User ID
+    distance (int) - Distance the User is willing to travel
     latitude (double) - Latitude of User's current location
     longitude (double) - Longitude of User's current location
     term (string) - Optional search term
@@ -25,14 +26,15 @@ class soloRecommendation(APIView):
         Returns restaurant recommendation based on user's preferences and location
         """
         try:
-        	uid = int(self.request.query_params.get('uid'))
-        	latitude = float(self.request.query_params.get('latitude'))
-        	longitude = float(self.request.query_params.get('longitude'))
-        	term = self.request.query_params.get('term')
+            uid = int(self.request.query_params.get('uid'))
+            distance = int(self.request.query_params.get('distance'))
+            latitude = float(self.request.query_params.get('latitude'))
+            longitude = float(self.request.query_params.get('longitude'))
+            term = self.request.query_params.get('term')
         except:
             return HttpResponse(json.dumps({'error': 'Error! Invalid parameters!'}), content_type="application/json")
 
-        allRestaurants = [x for x in query_api(longitude, latitude)['businesses']]
+        allRestaurants = [x for x in query_api(longitude, latitude, distance)['businesses']]
         user = User.objects.get(pk=uid)
         user_prefs = eval(user.preferences)
         user_dislikes = [x for x in user_prefs if user_prefs[x] == -1]
@@ -40,14 +42,10 @@ class soloRecommendation(APIView):
         for category in user_dislikes:
         	categoryDislikes.append(CATEGORY_DICT[category])
         categoryDislikeString = ','.join(categoryDislikes)
-        print('Dislikes: {}'.format(categoryDislikeString))
-        dislikes = query_api(longitude, latitude, categories=categoryDislikeString)['businesses'] if categoryDislikeString else []
-        #dislikes = [x['name'] for x in query_api(longitude, latitude, categories=categoryDislikeString)['businesses']] if categoryDislikeString else []
+        dislikes = query_api(longitude, latitude, distance, categories=categoryDislikeString)['businesses'] if categoryDislikeString else []
         if term:
         	# Give recommendations using keyword
-        	likes = query_api(longitude, latitude, term)['businesses']
-        	#likes = [x['name'] for x in query_api(longitude, latitude, term)['businesses']]
-        	print('Search term: {}'.format(term))	
+        	likes = query_api(longitude, latitude, distance, term)['businesses']
         else:
         	# Give recommendations based on user preferences
         	user_likes = [x for x in user_prefs if user_prefs[x] == 1]
@@ -55,9 +53,7 @@ class soloRecommendation(APIView):
         	for category in user_likes:
         		categoryLikes.append(CATEGORY_DICT[category])
         	categoryLikeString = ','.join(categoryLikes)
-        	print('Likes: {}'.format(categoryLikeString))
-        	likes = query_api(longitude, latitude, categories=categoryLikeString)['businesses']
-        	#likes = [x['name'] for x in query_api(longitude, latitude, categories=categoryLikeString)['businesses']]
+        	likes = query_api(longitude, latitude, distance, categories=categoryLikeString)['businesses']
 
         semilikes = [x for x in dislikes if x in likes]
         for item in semilikes:

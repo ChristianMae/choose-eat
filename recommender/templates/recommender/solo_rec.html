@@ -8,12 +8,20 @@
 {% block content %}
 <div class="row" id="pre-recommendation">
   <div class="container">
+    <div class="col s12">
+      <h5 class="otherfont">How far are you willing to go? (meters)</h5>
+      <form action="#">
+        <p class="range-field">
+          <input type="range" id="id_distance" min="500" max="40000" value="5000" />
+        </p>
+      </form>
+    </div>
     <div class="col s12 m5 l5 center-align">
       <form id="keyword_rec">
         {% csrf_token %}
         <div class="row">
           <div class="input-field col s12">
-              <input id="id_term" name="term" maxlength="24" type="text" placeholder="What are you looking to eat?" required>
+              <input id="id_term" name="term" maxlength="24" type="text" placeholder="What are you looking to eat?" required autocomplete="off">
               <small>Want to eat something specific? Could be some good 'chicken', or a delicious bowl of 'ramen' perhaps?</small> <br/>
           </div>
         </div>
@@ -24,7 +32,7 @@
       <h3 class="otherfont center-align">OR</h3>
     </div>
     <div class="col s12 m5 l5 center-align">
-      <a class="waves-effect waves-light btn-large black otherfont pulse" href="{% url 'recommender:solo' %}" style="margin-top: 6px;"><i class="material-icons left">restaurant_menu</i>Dazzle Me!</a>
+      <a id="nkey_rec" class="waves-effect waves-light btn-large black otherfont pulse" style="margin-top: 6px;"><i class="material-icons left">restaurant_menu</i>Dazzle Me!</a>
       <br /><br />
       <small>Not really looking for anything specific, but just want awesome food that'll match your taste? Leave it to us!</small> <br/>
     </div>
@@ -71,47 +79,58 @@ var restoList = {};
 var subtext = document.getElementById('subtext'); 
 
 $(document).ready(function(){
-    getLocation();
-    $('#loading').hide();
-    $('#results').hide();
+  getLocation();
+  $('#loading').hide();
+  $('#results').hide();
 });
 
-$('#keyword_rec').on('submit', function(event){
-    event.preventDefault();
-    console.log("form submitted!");
-
-    $.ajax({
-      type: 'GET',
-      url: '{% url 'soloRec' %}',
-      data: {
-        latitude: document.getElementById('id_latitude').innerHTML,
-        longitude: document.getElementById('id_longitude').innerHTML,
-        uid: {{ user.id }},
-        term: $('#id_term').val()
-      },
-      beforeSend: function() {
-        $('#pre-recommendation').hide();
-        $('#loading').show();
-        var x = document.getElementById('loadingtxt'), 
-        messages = ['Anytime now...', 'This is taking longer than expected...'],
-        i = 0;
-        setInterval(function () {
-          x.innerHTML = messages[i++];
-          i = messages.length === i ? 0 : i;
-        }, 5000);
-      },
-      complete: function(response) {
-        $('#loading').hide();
-      },
-      success: function(response) {
-        console.log(response);
-        restoList = response;
-        console.log(restoList);
-        nextResto();
-        $('#results').show();
-      }
-    })
+$('#keyword_rec').on('submit', function(e) {
+  e.preventDefault();
+  showSoloRec(e);
 });
+$('#nkey_rec').on('click', function(e) {
+  showSoloRec(e);
+});
+
+function showSoloRec(event) {
+  var params = {
+    latitude: 7.0689124,
+    longitude: 125.6018725,
+    uid: {{ user.id }},
+    distance: $('#id_distance').val()
+  };
+
+  if (event.target.id === 'keyword_rec') {
+    params.term = $('#id_term').val();
+  }
+
+  $.ajax({
+    type: 'GET',
+    url: '{% url 'soloRec' %}',
+    data: params,
+    beforeSend: function() {
+      $('#pre-recommendation').hide();
+      $('#loading').show();
+      var x = document.getElementById('loadingtxt'), 
+      messages = ['Anytime now...', 'This is taking longer than expected...'],
+      i = 0;
+      setInterval(function () {
+        x.innerHTML = messages[i++];
+        i = messages.length === i ? 0 : i;
+      }, 5000);
+    },
+    complete: function(response) {
+      $('#loading').hide();
+    },
+    success: function(response) {
+      console.log(response);
+      restoList = response;
+      console.log(restoList);
+      nextResto();
+      $('#results').show();
+    }
+  });
+}
 $(".button-collapse").sideNav();
 $('.dropdown-button').dropdown({
     inDuration: 300,
@@ -163,7 +182,6 @@ function nextResto() {
     subtext.innerHTML = "That was all of them! Back to start!"
   }
 
-  console.log('index: ' +index+ ' | actual: ' +actualIndex+ ' | over: ' +resultList.length+ ' | current: ' +resultList[actualIndex].name);
   var categories = [];
   for (var i = 0; i < resultList[actualIndex].categories.length; i++) {
     categories.push(resultList[actualIndex].categories[i].title);
@@ -181,11 +199,11 @@ function nextResto() {
 }
 
 function previousResto() {
-  if (index > 0) {
+  if (index === 1) {
+    Materialize.toast('We are just getting started!', 3000, 'rounded');
+  } else {
     index = index-2 < 0 ? 0 : index-2;
     nextResto();
-  } else {
-    Materialize.toast('We are just getting started!', 3000, 'rounded');
   }
 }
 </script>
