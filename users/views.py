@@ -1,10 +1,39 @@
+import json
 from django.shortcuts import render
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 from django.contrib.auth import login as log_in, logout, authenticate
 from django.contrib import messages
 from django.contrib.auth.views import login
+from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny
+from ceat.settings import CATEGORY_DICT
 from .forms import UserCreationForm
+from .models import User
+
+
+class setPreferences(APIView):
+    """
+    Set Preferences Endpoint
+    """
+    def post(self, request, format=None):
+        """
+        Returns restaurant recommendation based on anonymous user's given term
+        """
+        try:
+            uid = int(self.request.data.get('uid'))
+            ratings = json.loads(self.request.data.get('ratings'))
+        except Exception as ex:
+            print(ex)
+            return HttpResponse(json.dumps({'error': 'Error! Invalid parameters!'}), content_type="application/json")
+
+        user = User.objects.get(pk=uid)
+        user_prefs = eval(user.preferences)
+        for category in ratings:
+            user_prefs[category] = ratings[category]
+        user.preferences = json.dumps(user_prefs)
+        user.save()
+        return HttpResponse(json.dumps({'uid': uid, 'ratings': ratings}), content_type="application/json")
 
 
 def register(request):
@@ -46,4 +75,11 @@ def logout_view(request):
         logout(request)
     
     return HttpResponseRedirect(reverse('recommender:home'))
-        
+
+
+def prefs_view(request):
+    if request.user.is_authenticated:
+        print(request.META.get('HTTP_REFERER'))
+        return render(request, template_name='users/set_prefs.html', context={'categories': CATEGORY_DICT})
+    
+    return HttpResponseRedirect(reverse('recommender:home'))

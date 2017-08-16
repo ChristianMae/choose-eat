@@ -13,12 +13,13 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
-from users.models import User, Group
 from django.conf.urls import url, include
 from django.contrib import admin
 from rest_framework import routers, serializers, viewsets
 from rest_framework_swagger.views import get_swagger_view
 from recommender.views import soloRecommendation, groupRecommendation, anonRecommendation, login
+from users.views import setPreferences
+from users.models import User, Group
 
 
 # Serializers define the API representation.
@@ -57,6 +58,7 @@ urlpatterns = [
     url(r'^api/soloRecommendation', soloRecommendation.as_view(), name="soloRec"),
     url(r'^api/groupRecommendation', groupRecommendation.as_view(), name="groupRec"),
     url(r'^api/anonRecommendation', anonRecommendation.as_view(), name="anonRec"),
+    url(r'^api/setPreferences', setPreferences.as_view(), name="setPrefs"),
     url(r'^api/login', login.as_view()),
     url(r'', include('recommender.urls', namespace='recommender')),
     url(r'', include('users.urls', namespace='users')),

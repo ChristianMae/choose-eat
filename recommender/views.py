@@ -38,10 +38,7 @@ class soloRecommendation(APIView):
         user = User.objects.get(pk=uid)
         user_prefs = eval(user.preferences)
         user_dislikes = [x for x in user_prefs if user_prefs[x] == -1]
-        categoryDislikes = []
-        for category in user_dislikes:
-        	categoryDislikes.append(CATEGORY_DICT[category])
-        categoryDislikeString = ','.join(categoryDislikes)
+        categoryDislikeString = ','.join(user_dislikes)
         dislikes = query_api(longitude, latitude, distance, categories=categoryDislikeString)['businesses'] if categoryDislikeString else []
         if term:
         	# Give recommendations using keyword
@@ -49,10 +46,7 @@ class soloRecommendation(APIView):
         else:
         	# Give recommendations based on user preferences
         	user_likes = [x for x in user_prefs if user_prefs[x] == 1]
-        	categoryLikes = []
-        	for category in user_likes:
-        		categoryLikes.append(CATEGORY_DICT[category])
-        	categoryLikeString = ','.join(categoryLikes)
+        	categoryLikeString = ','.join(user_likes)
         	likes = query_api(longitude, latitude, distance, categories=categoryLikeString)['businesses']
 
         semilikes = [x for x in dislikes if x in likes]
@@ -105,7 +99,7 @@ class groupRecommendation(APIView):
         		user_prefs = eval(user.preferences)
         		user_dislikes = [x for x in user_prefs if user_prefs[x] == -1]
         		for category in user_dislikes:
-        			categoryDislikes.add(CATEGORY_DICT[category])
+        			categoryDislikes.add(category)
 
         	categoryDislikeString = ','.join(categoryDislikes)
         	print('Dislikes: {}'.format(categoryDislikeString))
@@ -153,9 +147,9 @@ class groupRecommendation(APIView):
         			if pref in allLikes:
         				user_semilikes.append(pref)
 
-        	likeString = ','.join([CATEGORY_DICT[category] for category in user_likes])
-        	semilikeString = ','.join([CATEGORY_DICT[category] for category in user_semilikes])
-        	dislikeString = ','.join([CATEGORY_DICT[category] for category in user_dislikes])
+        	likeString = ','.join(user_likes)
+        	semilikeString = ','.join(user_semilikes)
+        	dislikeString = ','.join(user_dislikes)
         	#dislikes = [x['name'] for x in query_api(longitude, latitude, categories=dislikeString)['businesses']] if dislikeString else []
         	dislikes = [x for x in query_api(longitude, latitude, categories=dislikeString)['businesses']] if dislikeString else []
         	#semilikes = [x['name'] for x in query_api(longitude, latitude, categories=semilikeString)['businesses']] if semilikeString else []

@@ -1,0 +1,136 @@
+{% extends 'recommender/base_rec.html' %}
+{% load static %}
+
+{% block title %}Choose-Eat | Solo{% endblock title %}
+
+{% block header %}Getting to know you{% endblock header %}
+{% block header_small %}Getting to know you{% endblock header_small %}
+
+{% block subtext %}Tell us which ones you like or dislike! (<span id="id_counter">10</span>){% endblock subtext %}
+
+{% block content %}
+<div class="row hide-on-small-only" id="pref_selection">
+  {% for name, code in categories.items %} 
+  <div class="col m3 l3">
+    <div class="card">
+      <div class="card-image">
+        <img src="{% static "recommender/lowimg.jpg" %}">
+        <p class="card-title shadowed hide-on-med-and-down">{{ name }}</p>
+        <p class="white-text shadowed hide-on-large-only" style="position:absolute;bottom:30px;left:20px;">{{ category }}</p>
+        <div id="id_btns_{{ code }}">
+          <a class="btn-floating halfway-fab waves-effect waves-light green center" id="{{ code }}2" href="#" onclick="storePreference(this.id);return false;"><i class="material-icons">check</i></a>
+          <a class="btn-floating halfway-fab waves-effect waves-light red left" id="{{ code }}1" href="#" onclick="storePreference(this.id);return false;"><i class="material-icons">not_interested</i></a>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+  <form>
+    {% csrf_token %}
+  </form>
+</div>
+
+<div class="row" id="loading">
+  <div class="col s12 center">
+    <br /><br />
+    <div class="preloader-wrapper big active">
+      <div class="spinner-layer spinner-red-only center-align">
+        <div class="circle-clipper left">
+          <div class="circle"></div>
+        </div><div class="gap-patch">
+          <div class="circle"></div>
+        </div><div class="circle-clipper right">
+          <div class="circle"></div>
+        </div>
+      </div>
+    </div>
+    <h5 class="otherfont" id="loadingtxt">Setting things up...</h4>
+  </div>
+</div>
+{% endblock content %}
+
+{% block javascript %}
+<script>
+var ratings = {};
+var counter = 10;
+
+$(document).ready(function(){
+  $('#loading').hide();
+});
+
+$(".button-collapse").sideNav();
+$('.dropdown-button').dropdown({
+    inDuration: 300,
+    outDuration: 225,
+    constrainWidth: true, // Does not change width of dropdown to that of the activator
+    hover: true, // Activate on hover
+    gutter: 0, // Spacing from edge
+    belowOrigin: true, // Displays dropdown below the button
+    alignment: 'left', // Displays dropdown with edge aligned to the left of button
+    stopPropagation: false // Stops event propagation
+  }
+);
+
+function storePreference(buttonId) {
+  var id = String(buttonId);
+  var cat = id.substring(0, id.length-1);
+  var val = parseInt(id.charAt(id.length-1));
+
+  switch(val) {
+    case 1:
+      ratings[cat] = -1;
+      counter--;
+      document.getElementById('id_btns_' +cat).innerHTML = '<a class="btn-floating halfway-fab waves-effect waves-light blue left" id="' +cat+ '3" href="#" onclick="storePreference(this.id);return false;"><i class="material-icons">not_interested</i></a>';
+      break;
+    case 2:
+      ratings[cat] = 1;
+      counter--;
+      document.getElementById('id_btns_' +cat).innerHTML = '<a class="btn-floating halfway-fab waves-effect waves-light blue right" id="' +cat+ '3" href="#" onclick="storePreference(this.id);return false;"><i class="material-icons">check</i></a>';
+      break;
+    case 3:
+      counter++;
+      delete ratings[cat];
+      document.getElementById('id_btns_' +cat).innerHTML = '<a class="btn-floating halfway-fab waves-effect waves-light green center" id="' +cat+ '2" href="#" onclick="storePreference(this.id);return false;"><i class="material-icons">check</i></a><a class="btn-floating halfway-fab waves-effect waves-light red left" id="' +cat+ '1" href="#" onclick="storePreference(this.id);return false;"><i class="material-icons">not_interested</i></a>'
+      break;
+  }
+  
+  if (counter > 0) {
+    document.getElementById('id_counter').innerHTML = counter;
+  } else {
+    var params = {
+      uid: {{ user.id }},
+      ratings: JSON.stringify(ratings),
+      csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken').val()
+    };
+    
+    $.ajax({
+      type: 'POST',
+      url: '{% url 'setPrefs' %}',
+      data: params,
+      beforeSend: function() {
+        $('#pref_selection').hide();
+        $('#subtext').hide();
+        $('#loading').show();
+        var x = document.getElementById('loadingtxt'), 
+        messages = ['Almost there...', 'This is taking longer than expected...'],
+        i = 0;
+        setInterval(function () {
+          x.innerHTML = messages[i++];
+          i = messages.length === i ? 0 : i;
+        }, 5000);
+      },
+      complete: function(response) {
+        $('#loading').hide();
+      },
+      success: function(response) {
+        document.getElementById('subtext').innerHTML = 'All set! Redirecting you to home page...';
+        $('#subtext').show();
+        setTimeout(function() { 
+          window.location.replace("http://127.0.0.1:8000"); 
+        }, 3000);
+      }
+    });
+  }
+}
+</script>
+{% endblock %}
