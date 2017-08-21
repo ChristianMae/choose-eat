@@ -6,7 +6,6 @@ from django.contrib.auth import login as log_in, logout, authenticate
 from django.contrib import messages
 from django.contrib.auth.views import login
 from rest_framework.views import APIView
-from rest_framework.permissions import AllowAny
 from ceat.settings import CATEGORY_DICT
 from .forms import UserCreationForm
 from .models import User
@@ -45,6 +44,8 @@ def register(request):
         if request.POST['username'] != '' and request.POST['password1'] != '' and request.POST['password2'] != '':
             if len(request.POST['username']) < 8:
                 messages.error(request, 'Username should be at least 8 characters')
+            elif len(request.POST['username']) > 16:
+                messages.error(request, 'Username can only be up to 16 characters')
             elif form.is_valid():
                 new_user = form.save(commit=False)
                 new_user.first_name = request.POST['first_name'].title()
@@ -52,7 +53,7 @@ def register(request):
                 new_user.save()
                 authenticated_user = authenticate(username=new_user.username, password=request.POST['password1'])
                 log_in(request, authenticated_user)
-                return HttpResponseRedirect(reverse('recommender:home'))
+                return HttpResponseRedirect(reverse('users:start_prefs'))
         else:
             messages.error(request, 'You left one or more required field(s) blank')
             
@@ -80,6 +81,14 @@ def logout_view(request):
 def prefs_view(request):
     if request.user.is_authenticated:
         print(request.META.get('HTTP_REFERER'))
-        return render(request, template_name='users/set_prefs.html', context={'categories': CATEGORY_DICT})
+        return render(request, template_name='users/start_prefs.html', context={'categories': CATEGORY_DICT})
+    
+    return HttpResponseRedirect(reverse('recommender:home'))
+
+
+def settings_prefs(request):
+    user_prefs = eval(User.objects.get(pk=request.user.id).preferences)
+    if request.user.is_authenticated:
+        return render(request, template_name='users/settings_prefs.html', context={'categories': CATEGORY_DICT, 'preferences': user_prefs})
     
     return HttpResponseRedirect(reverse('recommender:home'))

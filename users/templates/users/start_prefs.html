@@ -1,12 +1,12 @@
 {% extends 'recommender/base_rec.html' %}
 {% load static %}
 
-{% block title %}Choose-Eat | Solo{% endblock title %}
+{% block title %}Choose-Eat | Starting Preferences{% endblock title %}
 
 {% block header %}Getting to know you{% endblock header %}
 {% block header_small %}Getting to know you{% endblock header_small %}
 
-{% block subtext %}Tell us which ones you like or dislike! (<span id="id_counter">10</span>){% endblock subtext %}
+{% block subtext %}Tell us which ones you like or dislike! (<span id="id_counter">10</span> left){% endblock subtext %}
 
 {% block content %}
 <div class="row hide-on-small-only" id="pref_selection">
@@ -16,7 +16,7 @@
       <div class="card-image">
         <img src="{% static "recommender/lowimg.jpg" %}">
         <p class="card-title shadowed hide-on-med-and-down">{{ name }}</p>
-        <p class="white-text shadowed hide-on-large-only" style="position:absolute;bottom:30px;left:20px;">{{ category }}</p>
+        <p class="white-text shadowed hide-on-large-only" style="position:absolute;bottom:30px;left:20px;">{{ name }}</p>
         <div id="id_btns_{{ code }}">
           <a class="btn-floating halfway-fab waves-effect waves-light green center" id="{{ code }}2" href="#" onclick="storePreference(this.id);return false;"><i class="material-icons">check</i></a>
           <a class="btn-floating halfway-fab waves-effect waves-light red left" id="{{ code }}1" href="#" onclick="storePreference(this.id);return false;"><i class="material-icons">not_interested</i></a>
