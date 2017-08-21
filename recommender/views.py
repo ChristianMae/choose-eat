@@ -6,7 +6,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from rest_framework.views import APIView
 from users.models import User, Group
-from ceat.settings import CATEGORY_DICT, MY_URL
+from ceat.settings import MY_URL, GOOGLE_API_KEY
 from .utils import query_api
 
 
@@ -243,7 +243,7 @@ def soloRec_page(request):
         return HttpResponseRedirect(reverse('recommender:home'))
 
     template = 'recommender/solo_rec.html'
-    context = {}
+    context = {'googlekey': GOOGLE_API_KEY}
 
     return render(request, template, context)
 	

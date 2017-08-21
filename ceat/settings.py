@@ -137,4 +137,6 @@ with open(os.path.join(BASE_DIR, 'catAliases.txt')) as f:
     CATEGORY_DICT = eval(f.read())
 with open(os.path.join(BASE_DIR, 'defaultpref.txt')) as f:
     DEFAULT_PREFS = f.read().strip()
+with open(os.path.join(BASE_DIR, 'googlekey.txt')) as f:
+    GOOGLE_API_KEY = f.read().strip()
     
