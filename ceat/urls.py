@@ -17,8 +17,8 @@ from django.conf.urls import url, include
 from django.contrib import admin
 from rest_framework import routers, serializers, viewsets
 from rest_framework_swagger.views import get_swagger_view
-from recommender.views import soloRecommendation, groupRecommendation, anonRecommendation, login
-from users.views import setPreferences
+from recommender.views import soloRecommendation, groupRecommendation, anonRecommendation
+from users.views import setPreferences, login, registration
 from users.models import User, Group
 
 
@@ -27,7 +27,7 @@ from users.models import User, Group
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
-        fields = ('url', 'username', 'first_name', 'last_name', 'email', 'bio', 'birth_date', 'preferences', 'date_joined')
+        fields = ('url', 'id', 'username', 'first_name', 'last_name', 'email', 'bio', 'birth_date', 'preferences', 'date_joined')
 
 # ViewSets define the view behavior.
 class UserViewSet(viewsets.ModelViewSet):
@@ -60,6 +60,7 @@ urlpatterns = [
     url(r'^api/anonRecommendation', anonRecommendation.as_view(), name="anonRec"),
     url(r'^api/setPreferences', setPreferences.as_view(), name="setPrefs"),
     url(r'^api/login', login.as_view()),
+    url(r'^api/registration', registration.as_view()),
     url(r'', include('recommender.urls', namespace='recommender')),
     url(r'', include('users.urls', namespace='users')),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))

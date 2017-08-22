@@ -202,34 +202,6 @@ class anonRecommendation(APIView):
         others = [x for x in allRestaurants if x not in likes]
         return HttpResponse(json.dumps({'likes': likes, 'others': others}), content_type="application/json")
 
-
-class login(APIView):
-    """
-    Login Endpoint
-
-    Parameters:
-    username (string) - User's username
-    password (string) - User's password
-    """
-    def get(self, request, format=None):
-        """
-        Returns user details if credentials are valid, else an error
-        """
-        username = self.request.query_params.get('username')
-        password = self.request.query_params.get('password')
-        
-        try:
-        	user = User.objects.get(username=username)
-        	if user.check_password(password):
-        		url = '{}/api/users/{}'.format(MY_URL, user.id)
-        		response = requests.get(url)
-        	else:
-        		response = json.dumps({'error': 'Invalid password!'})
-        except User.DoesNotExist:
-        	response = json.dumps({'error': 'User does not exist!'}) 
-        
-        return HttpResponse(response, content_type="application/json")
-
         
 def home(request):
     template = 'recommender/home_in.html' if request.user.is_authenticated else 'recommender/home.html'

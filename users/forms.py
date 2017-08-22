@@ -17,9 +17,18 @@ class UserCreationForm(forms.ModelForm):
         widget=forms.PasswordInput,
         help_text=_("Enter the same password as above, for verification."))
 
+    def __init__(self, *args, **kwargs):
+        super(UserCreationForm, self).__init__(*args, **kwargs)
+        self.fields['first_name'].required = True
+        self.fields['last_name'].required = True
+
+
     class Meta:
         model = User
         fields = ("username","first_name", "last_name",)
+        help_texts = {
+            'username': 'Required, 8-16 characters. Letters, digits, and @/./+/-/_ only.',
+        }
 
     def clean_password2(self):
         password1 = self.cleaned_data.get("password1")
