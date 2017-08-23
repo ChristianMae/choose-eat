@@ -30,8 +30,11 @@ class login(APIView):
         try:
             user = User.objects.get(username=username)
             if user.check_password(password):
-                url = '{}/api/users/{}'.format(MY_URL, user.id)
-                response = requests.get(url)
+                data = serializers.serialize('json', [user,])
+                struct = json.loads(data)
+                data = json.dumps(struct[0])
+
+                response = data
             else:
                 response = json.dumps({'error': 'Invalid password!'})
         except User.DoesNotExist:
