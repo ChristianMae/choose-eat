@@ -17,7 +17,7 @@ from django.conf.urls import url, include
 from django.contrib import admin
 from rest_framework import routers, serializers, viewsets
 from rest_framework_swagger.views import get_swagger_view
-from recommender.views import soloRecommendation, groupRecommendation, anonRecommendation
+from recommender.views import soloRecommendation, groupRecommendation, trialRecommendation
 from users.views import setPreferences, login, registration
 from users.models import User, Group
 
@@ -57,7 +57,7 @@ urlpatterns = [
     url(r'^api-endpoints/', schema_view),
     url(r'^api/soloRecommendation', soloRecommendation.as_view(), name="soloRec"),
     url(r'^api/groupRecommendation', groupRecommendation.as_view(), name="groupRec"),
-    url(r'^api/anonRecommendation', anonRecommendation.as_view(), name="anonRec"),
+    url(r'^api/trialRecommendation', trialRecommendation.as_view(), name="trialRec"),
     url(r'^api/setPreferences', setPreferences.as_view(), name="setPrefs"),
     url(r'^api/login', login.as_view()),
     url(r'^api/registration', registration.as_view()),

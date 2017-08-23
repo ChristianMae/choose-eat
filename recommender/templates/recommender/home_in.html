@@ -8,16 +8,7 @@
   <a href="#!name"><span class="white-text name">{{ user.first_name }} {{ user.last_name }}</span></a>
   <a href="#"><span class="white-text email">({{ user.username }})</span></a>
 </div></li>
-<li><ul class="collapsible collapsible-accordion" style="margin-left:16px;">
-  <li><a href="#!" class="waves-effect collapsible-header"><i class="tiny material-icons">restaurant</i>Get recommendations</a>
-    <div class="collapsible-body">
-      <ul>
-        <li><a href="{% url 'recommender:solo' %}">Solo</a></li>
-        <li><a href="{% url 'recommender:group' %}">Group</a></li>
-      </ul>
-    </div>
-  </li>
-</ul></li>
+<li><a href="{% url 'recommender:home' %}" class="waves-effect"><i class="tiny material-icons">restaurant</i>Get recommendations</a></li>
 <li><div class="divider"></div></li>
 <li><a href="#!" class="waves-effect"><i class="tiny material-icons">account_circle</i>My Profile</a></li>
 <li><a href="#!" class="waves-effect"><i class="tiny material-icons">settings</i>Account Settings</a></li>
@@ -26,12 +17,12 @@
 {% endblock mobile-menu %}
 
 {% block headercard %}
-<div class="row hide-on-med-and-up" style="position:relative;top:-68rem;">
+<div class="row hide-on-med-and-up otherfont" style="position:relative;top:-68rem;" id="select_card">
   <div class="col l3"></div>
   <div class="col s12 l6">
     <div class="form-container center-align" style="padding-bottom: 20px;">
       <br />
-      <a class="waves-effect waves-light btn-large black" style="width: 175px;" href="{% url 'recommender:solo' %}"><i class="material-icons left">person</i>Solo</a>
+      <a class="waves-effect waves-light btn-large black" style="width: 175px;" href="javascript:showSoloRec();"><i class="material-icons left">person</i>Solo</a>
       <h3 class="otherfont shadowed">OR</h3>
 	  <a class="waves-effect waves-light btn-large black" style="width: 175px;" href="{% url 'recommender:group' %}"><i class="material-icons left">group</i>Group</a>
       <br />
@@ -39,12 +30,12 @@
   </div>
 </div>
 
-<div class="row hide-on-small-only hide-on-large-only" style="position:relative;top:-60rem;">
+<div class="row hide-on-small-only hide-on-large-only otherfont" style="position:relative;top:-60rem;" id="select_card2">
   <div class="col l3"></div>
   <div class="col s12 l6">
     <div class="form-container center-align" style="padding-bottom: 20px;">
       <br />
-      <a class="waves-effect waves-light btn-large black" style="width: 175px;" href="{% url 'recommender:solo' %}"><i class="material-icons left">person</i>Solo</a>
+      <a class="waves-effect waves-light btn-large black" style="width: 175px;" href="javascript:showSoloRec();"><i class="material-icons left">person</i>Solo</a>
       <h3 class="otherfont shadowed">OR</h3>
 	  <a class="waves-effect waves-light btn-large black" style="width: 175px;" href="{% url 'recommender:group' %}"><i class="material-icons left">group</i>Group</a>
       <br />
@@ -52,12 +43,12 @@
   </div>
 </div>
 
-<div class="row hide-on-med-and-down" style="position:relative;top:-55rem;">
+<div class="row hide-on-med-and-down otherfont" style="position:relative;top:-55rem;" id="select_card3">
   <div class="col l3"></div>
   <div class="col s12 l6">
     <div class="form-container center-align" style="padding-bottom: 20px;">
       <br />
-      <a class="waves-effect waves-light btn-large black" style="width: 175px;" href="{% url 'recommender:solo' %}"><i class="material-icons left">person</i>Solo</a>
+      <a class="waves-effect waves-light btn-large black" style="width: 175px;" href="javascript:showSoloRec();"><i class="material-icons left">person</i>Solo</a>
       <h3 class="otherfont shadowed">OR</h3>
 	  <a class="waves-effect waves-light btn-large black" style="width: 175px;" href="{% url 'recommender:group' %}"><i class="material-icons left">group</i>Group</a>
       <br />
@@ -78,6 +69,7 @@
 {% endblock %}
 
 {% block content %}
+<span class="white-text" id="locations"><b id="id_latitude"></b><b id="id_longitude"></b></span>
 <ul id="about-items">
   <li style="opacity:0;"><h2 class="header otherfont">About</h2></li>
   <li style="opacity:0;"><p class="black-text" style="max-width: 1000px; word-wrap: break-word;">
@@ -100,8 +92,314 @@
 	Dock is a school project, made with the use of <a href="https://www.djangoproject.com/">Django</a> and <a href="http://materializecss.com/">MaterializeCSS</a>.</b>
   </p></li>
 </ul>
+
+<div class="row" id="header_text">
+  <div class="col s12">
+    <h3 id="hdr" class="otherfont center-align hide-on-med-and-up"></h3>
+    <h2 id="hdr2" class="otherfont center-align hide-on-small-only"></h2>
+    <p id="subtext" class="center-align otherfont"></p>
+  </div>
+</div>
+
+<div class="row" id="preSoloRec">
+  <div class="container">
+    <div class="col s12">
+      <h5 class="otherfont">How far are you willing to go? (km)</h5>
+      <form action="#">
+        <p class="range-field">
+          <input type="range" id="id_distance" min="1" max="40" value="5" />
+        </p>
+      </form>
+    </div>
+    <div class="col s12 m5 l5 center-align">
+      <form id="keyword_rec">
+        {% csrf_token %}
+        <div class="row">
+          <div class="input-field col s12">
+              <input id="id_term" name="term" maxlength="24" type="text" placeholder="What are you looking to eat?" required autocomplete="off">
+              <small>Want to eat something specific? Could be some good 'chicken', or a delicious bowl of 'ramen' perhaps?</small> <br/>
+          </div>
+        </div>
+        <button class="btn black waves-effect waves-light otherfont" type="submit" name="action">Submit</button>
+      </form>
+    </div>
+    <div class="col s12 m2 l2">
+      <h3 class="otherfont center-align">OR</h3>
+    </div>
+    <div class="col s12 m5 l5 center-align">
+      <a id="nkey_rec" class="waves-effect waves-light btn-large black otherfont pulse" style="margin-top: 6px;"><i class="material-icons left">restaurant_menu</i>Dazzle Me!</a>
+      <br /><br />
+      <small>Not really looking for anything specific, but just want awesome food that'll match your taste? Leave it to us!</small> <br/>
+    </div>
+  </div>
+</div>
+
+<div class="row" id="loading">
+  <div class="col s12 center">
+    <br /><br />
+    <div class="preloader-wrapper big active">
+      <div class="spinner-layer spinner-red-only center-align">
+        <div class="circle-clipper left">
+          <div class="circle"></div>
+        </div><div class="gap-patch">
+          <div class="circle"></div>
+        </div><div class="circle-clipper right">
+          <div class="circle"></div>
+        </div>
+      </div>
+    </div>
+    <h5 class="otherfont" id="loadingtxt">Fetching results...</h4>
+  </div>
+</div>
+
+<div class="row" id="results">
+  <div class="col s12 center">
+    <img id="resto-img" class="z-depth-4 hide-on-small-only" style="border: 3px solid black; height:250px;width:350px; border-radius: 35%;" src=""/>
+    <img id="resto-img2" class="z-depth-4 hide-on-med-and-up" style="border: 3px solid black; height:200px;width:250px; border-radius: 35%;" src=""/>
+    <h4 id="resto-name" class="otherfont"></h3>
+    <p id="resto-address"></p>
+    <span class="center-align"><small id="resto-distance"></small> | <small id="resto-categories"></small></span><br /><br />
+    <a class="btn-floating btn-large waves-effect waves-light red" href="javascript:nextResto();"><i class="material-icons">not_interested</i></a>
+    <a class="btn-floating btn-large waves-effect waves-light blue" href="javascript:previousResto();"><i class="material-icons">replay</i></a>
+    <a class="btn-floating btn-large waves-effect waves-light green" href="javascript:acceptResto();"><i class="material-icons">check</i></a>
+  </div>
+</div>
+
+<div class="row" id="no-results">
+  <div class="col s12 center">
+    <br/>
+    <h4 class="otherfont">No results found for "<span id="usedterm"></span>". Try using a different keyword!</h4>
+    <br/>
+    <a class="waves-effect waves-light btn-large black otherfont" href="javascript:retryRec();"><i class="material-icons left">find_replace</i>Try Again</a>
+  </div>
+</div>
+
+<div id="accepted">
+  <div class="row">
+    <div id="map" class="col s12 m6 l6" style="height:500px;"></div>
+    <div id="right-panel" class="col s12 m6 l6" style="height:500px;"></div>
+  </div>
+  <div class="row center-align">
+    <a class="waves-effect waves-light btn-large green otherfont" href="javascript:retryRec();"><i class="material-icons left">thumb_up</i>I'm here</a>
+  </div>
+</div>
 {% endblock content %}
 
 {% block javascript %}
-{% endblock %}
+<script>
+var index = 0;
+var restoList = {};
+var actualIndex = 0;
+var resultList;
+var subtext = document.getElementById('subtext'); 
 
+$(document).ready(function() {
+  getLocation();
+  $('#locations').hide();
+  $('#header_text').hide();
+  $('#preSoloRec').hide();
+  $('#loading').hide();
+  $('#results').hide();
+  $('#no-results').hide();
+  $('#accepted').hide();
+});
+
+$('#keyword_rec').on('submit', function(e) {
+  e.preventDefault();
+  getSoloResults(e);
+});
+$('#nkey_rec').on('click', function(e) {
+  getSoloResults(e);
+});
+
+function showSoloRec() {
+  $('#about-items').hide();
+  $('#select_card').hide();
+  $('#select_card2').hide();
+  $('#select_card3').hide();
+
+  document.getElementById('hdr').innerHTML = "Solo Recommendation";
+  document.getElementById('hdr2').innerHTML = "Solo Recommendation";
+  $('#header_text').show();
+  $('#preSoloRec').show();
+  
+  $('html, body').animate({
+      scrollTop: $("#about").offset().top-75
+  }, 1000);
+}
+
+function getSoloResults(event) {
+  var params = {
+    latitude: document.getElementById("id_latitude").innerHTML,
+    longitude: document.getElementById("id_longitude").innerHTML,
+    uid: {{ user.id }},
+    distance: $('#id_distance').val() * 1000
+  };
+
+  if (event.target.id === 'keyword_rec') {
+    params.term = $('#id_term').val();
+    document.getElementById('id_term').value=null;
+  }
+
+  $.ajax({
+    type: 'GET',
+    url: '{% url 'soloRec' %}',
+    data: params,
+    beforeSend: function() {
+      $('#preSoloRec').hide();
+      $('#loading').show();
+      var x = document.getElementById('loadingtxt'), 
+      messages = ['Anytime now...', 'This is taking longer than expected...'],
+      i = 0;
+      setInterval(function () {
+        x.innerHTML = messages[i++];
+        i = messages.length === i ? 0 : i;
+      }, 5000);
+    },
+    complete: function(response) {
+      $('#loading').hide();
+    },
+    success: function(response) {
+      restoList = response;
+      console.log(restoList);
+      if (restoList.likes.length == 0 && restoList.semilikes.length == 0 && restoList.others.length == 0 && restoList.dislikes.length == 0) {
+        document.getElementById('usedterm').innerHTML = params.term;
+        $('#no-results').show();
+      } else {
+        nextResto();
+        $('#results').show();
+      }
+    }
+  });
+}
+
+function getLocation() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function(position) {
+      document.getElementById("id_latitude").innerHTML = ''+ position.coords.latitude;
+      document.getElementById("id_longitude").innerHTML = position.coords.longitude;
+    });
+  } else { 
+    alert("Geolocation is not supported by this browser :( Try using a different browser or get the mobile app!");
+  }
+}
+
+function nextResto() {
+  if (index < restoList.likes.length) {
+    actualIndex = index;
+    resultList = restoList.likes;
+    subtext.innerHTML = "You'll surely love these!"
+  } else if (index-restoList.likes.length < restoList.semilikes.length) {
+    actualIndex = index-restoList.likes.length;
+    resultList = restoList.semilikes;
+    subtext.innerHTML = "You'll probably like these too!"
+  } else if (index-restoList.likes.length-restoList.semilikes.length < restoList.others.length) {
+    actualIndex = index-restoList.likes.length-restoList.semilikes.length;
+    resultList = restoList.others;
+    subtext.innerHTML = "Try these ones out!"
+  } else if (index-restoList.likes.length-restoList.semilikes.length-restoList.others.length < restoList.dislikes.length) {
+    actualIndex = index-restoList.likes.length-restoList.semilikes.length-restoList.others.length;
+    resultList = restoList.dislikes;
+    subtext.innerHTML = "Not too sure about these ones..."
+  } else {
+    index = 0;
+    actualIndex = 0;
+    resultList = restoList.likes;
+    subtext.innerHTML = "That was all of them! Back to start!"
+  }
+
+  var categories = [];
+  for (var i = 0; i < resultList[actualIndex].categories.length; i++) {
+    categories.push(resultList[actualIndex].categories[i].title);
+  }
+  var address = resultList[actualIndex].location.address2 === '' || resultList[actualIndex].location.address2 === null ? resultList[actualIndex].location.address1 : resultList[actualIndex].location.address1+', '+resultList[actualIndex].location.address2;
+
+  document.getElementById('resto-img').src = resultList[actualIndex].image_url;
+  document.getElementById('resto-img2').src = resultList[actualIndex].image_url;
+  document.getElementById('resto-name').innerHTML = resultList[actualIndex].name;
+  document.getElementById('resto-address').innerHTML = address;
+  document.getElementById('resto-distance').innerHTML = 'Approx. '+(resultList[actualIndex].distance/1000).toFixed(1)+' km away';
+  document.getElementById('resto-categories').innerHTML = categories.join(', ');
+
+  index++;
+}
+
+function previousResto() {
+  if (index === 1) {
+    Materialize.toast('We are just getting started!', 3000, 'rounded');
+  } else {
+    index = index-2 < 0 ? 0 : index-2;
+    nextResto();
+  }
+}
+
+function acceptResto() {
+  document.getElementById('hdr').innerHTML = resultList[actualIndex].name;
+  document.getElementById('hdr2').innerHTML = resultList[actualIndex].name;
+  document.getElementById('subtext').innerHTML = "Mode of Travel:<br/><div class='col m4 l4'></div><select id='mode' class='browser-default col s12 m4 l4'><option value='DRIVING'>Driving</option><option value='WALKING'>Walking</option><option value='BICYCLING'>Bicycling</option><option value='TRANSIT'>Transit</option></select>";
+  initMap();
+  $('#results').hide();
+  $('#accepted').show();
+}
+
+function initMap() {
+  var directionsDisplay = new google.maps.DirectionsRenderer;
+  var directionsService = new google.maps.DirectionsService;
+  var map = new google.maps.Map(document.getElementById('map'), {
+    zoom: 10,
+    center: {lat: 7.0689124, lng: 125.6018725}
+  });
+  directionsDisplay.setMap(map);
+  directionsDisplay.setPanel(document.getElementById('right-panel'));
+
+  calculateAndDisplayRoute(directionsService, directionsDisplay);
+  document.getElementById('mode').addEventListener('change', function() {
+    calculateAndDisplayRoute(directionsService, directionsDisplay);
+  });
+}
+
+function calculateAndDisplayRoute(directionsService, directionsDisplay) {
+  var selectedMode = document.getElementById('mode').value;
+  var dest;
+  if (resultList[actualIndex].coordinates.latitude === null || resultList[actualIndex].coordinates.longitude === null) {
+    dest = resultList[actualIndex].location.display_address.join(', ');
+  } else {
+    dest = {
+      lat: resultList[actualIndex].coordinates.latitude,
+      lng: resultList[actualIndex].coordinates.longitude
+    };
+  }
+  
+  directionsService.route({
+    origin: {lat: 7.0689124, lng: 125.6018725}, 
+    destination: dest,  
+    travelMode: google.maps.TravelMode[selectedMode]
+  }, function(response, status) {
+    if (status == 'OK') {
+      directionsDisplay.setDirections(response);
+    } else {
+      window.alert('Directions request failed due to ' + status);
+    }
+  });
+}
+
+function retryRec() {
+  $('html, body').animate({
+      scrollTop: $("#start").offset().top
+  }, 1000);
+  $('#no-results').hide();
+  $('#accepted').hide();
+  $('#header_text').hide();
+  $('#about-items').show();
+  $('#select_card').show();
+  $('#select_card2').show();
+  $('#select_card3').show();
+  Materialize.toast('Bon appétit! Tell us about your experience later! (Profile > History)', 10000, 'rounded');
+}
+
+</script>
+<script async defer
+    src="https://maps.googleapis.com/maps/api/js?key={{ googlekey }}">
+    </script>
+</script>
+{% endblock javascript %}

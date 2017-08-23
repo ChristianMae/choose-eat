@@ -3,17 +3,6 @@ $(document).ready(function(){
     $(".button-collapse").sideNav();
 });
 
-function getLocations() {
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function(position) {
-            document.getElementById("id_latitude").value = position.coords.latitude;
-            document.getElementById("id_longitude").value = position.coords.longitude;
-        });        
-    } else { 
-        alert("Geolocation is not supported by this browser.");
-    }
-}
-
 var options = [
     {selector: '#about', offset: 250, callback: function(el) {
         Materialize.showStaggeredList('#about-items');

@@ -5,7 +5,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 from django.contrib.auth import login as log_in, logout, authenticate
 from django.contrib import messages
-from django.contrib.auth.views import login
+from django.contrib.auth.views import login as login_view
 from rest_framework.views import APIView
 from ceat.settings import CATEGORY_DICT
 from .forms import UserCreationForm
@@ -137,7 +137,7 @@ def custom_login(request):
     if request.user.is_authenticated:
         return HttpResponseRedirect(reverse('recommender:home'))     
     else:
-        return login(request, template_name='users/login.html')
+        return login_view(request, template_name='users/login.html')
 
 
 def logout_view(request):

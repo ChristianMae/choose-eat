@@ -45,9 +45,12 @@ class soloRecommendation(APIView):
         	likes = query_api(longitude, latitude, distance, term)['businesses']
         else:
         	# Give recommendations based on user preferences
-        	user_likes = [x for x in user_prefs if user_prefs[x] == 1]
-        	categoryLikeString = ','.join(user_likes)
-        	likes = query_api(longitude, latitude, distance, categories=categoryLikeString)['businesses']
+            user_likes = [x for x in user_prefs if user_prefs[x] == 1]
+            categoryLikeString = ','.join(user_likes)
+            if categoryLikeString:
+                likes = query_api(longitude, latitude, distance, categories=categoryLikeString)['businesses']
+            else:
+                likes = []
 
         semilikes = [x for x in dislikes if x in likes]
         for item in semilikes:
@@ -177,7 +180,7 @@ class groupRecommendation(APIView):
         return HttpResponse(json.dumps({'likes': likes, 'semilikes': semilikes, 'others': others, 'dislikes': dislikes}), content_type="application/json")
 
         
-class anonRecommendation(APIView):
+class trialRecommendation(APIView):
     """
     Anonymous Restaurant Recommendation Endpoint
 
@@ -198,37 +201,16 @@ class anonRecommendation(APIView):
             return HttpResponse(json.dumps({'error': 'Error! Invalid parameters!'}), content_type="application/json")
 
         allRestaurants = [x for x in query_api(longitude, latitude)['businesses']]
-        likes = query_api(longitude, latitude, term)['businesses']
+        likes = query_api(longitude, latitude, term=term)['businesses']
         others = [x for x in allRestaurants if x not in likes]
         return HttpResponse(json.dumps({'likes': likes, 'others': others}), content_type="application/json")
 
         
 def home(request):
     template = 'recommender/home_in.html' if request.user.is_authenticated else 'recommender/home.html'
-    context = {}
-
-    return render(request, template, context)
-
-
-def soloRec_page(request):
-    if not request.user.is_authenticated:
-        return HttpResponseRedirect(reverse('recommender:home'))
-
-    template = 'recommender/solo_rec.html'
     context = {'googlekey': GOOGLE_API_KEY}
 
     return render(request, template, context)
-	
-
-def groupRec_page(request):
-    if not request.user.is_authenticated:
-        return HttpResponseRedirect(reverse('recommender:home'))
-
-    template = 'recommender/group_rec.html'
-    context = {}
-
-    return render(request, template, context)
-
 
 """
 Missing:
