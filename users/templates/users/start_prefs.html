@@ -16,7 +16,7 @@
   <div class="col m3 l3">
     <div class="card">
       <div class="card-image">
-        <img src="{% with 'recommender/'|add:code|add:'.jpg' as image_static %}{% static image_static %}{% endwith %}">
+        <img src="{% with 'recommender/pref-imgs/'|add:code|add:'.jpg' as image_static %}{% static image_static %}{% endwith %}">
         <p class="card-title shadowed hide-on-med-and-down">{{ name }}</p>
         <p class="white-text shadowed hide-on-large-only" style="position:absolute;bottom:30px;left:20px;">{{ name }}</p>
         <div id="id_btns_{{ code }}">
