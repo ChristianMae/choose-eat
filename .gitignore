@@ -102,6 +102,7 @@ ENV/
 .mypy_cache/
 
 *.sqlite3
+pref-imgs/
 yelpkeys.txt
 secretkey.txt
 googlekey.txt

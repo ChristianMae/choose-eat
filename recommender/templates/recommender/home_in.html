@@ -1,5 +1,6 @@
 {% extends 'recommender/base.html' %}
 
+{% load static %}
 {% block mobile-menu %}
 <li><div class="user-view">
   <div class="background grey darken-4">
@@ -108,8 +109,12 @@
       <form action="#">
         <p class="range-field">
           <input type="range" id="id_distance" min="1" max="40" value="5" />
+          <small style="margin-bottom: 100px;">Higher search distance will most likely result to more results! (Default: 5 km)</small>
         </p>
       </form>
+      <h5 class="otherfont">Price levels:</h5>
+      <div id="test-slider" style="margin-top: 25px;margin-bottom: 15px;"></div>
+      <p><small style="margin-bottom: 100px;">Setting a price range other than the default might cause exclusion of some restaurants or lesser results. (Default: 1-4)</small></p>
     </div>
     <div class="col s12 m5 l5 center-align">
       <form id="keyword_rec">
@@ -191,7 +196,8 @@ var index = 0;
 var restoList = {};
 var actualIndex = 0;
 var resultList;
-var subtext = document.getElementById('subtext'); 
+var subtext = document.getElementById('subtext');
+var slider = document.getElementById('test-slider'); 
 
 $(document).ready(function() {
   getLocation();
@@ -202,6 +208,20 @@ $(document).ready(function() {
   $('#results').hide();
   $('#no-results').hide();
   $('#accepted').hide();
+
+  noUiSlider.create(slider, {
+   start: [1, 4],
+   connect: true,
+   step: 1,
+   orientation: 'horizontal', // 'horizontal' or 'vertical'
+   range: {
+     'min': 1,
+     'max': 4
+   },
+   format: wNumb({
+     decimals: 0
+   })
+  });
 });
 
 $('#keyword_rec').on('submit', function(e) {
@@ -230,11 +250,20 @@ function showSoloRec() {
 
 function getSoloResults(event) {
   var params = {
-    latitude: document.getElementById("id_latitude").innerHTML,
-    longitude: document.getElementById("id_longitude").innerHTML,
+    latitude: 7.0689124,
+    longitude: 125.6018725,
     uid: {{ user.id }},
     distance: $('#id_distance').val() * 1000
   };
+
+  var priceRange = slider.noUiSlider.get();
+  if (priceRange != '1,4') {
+    priceRange = priceRange.split(',');
+    console.log(priceRange);
+  } else {
+    console.log(priceRange)
+    console.log('fkn equal');
+  }
 
   if (event.target.id === 'keyword_rec') {
     params.term = $('#id_term').val();
@@ -336,7 +365,7 @@ function previousResto() {
 function acceptResto() {
   document.getElementById('hdr').innerHTML = resultList[actualIndex].name;
   document.getElementById('hdr2').innerHTML = resultList[actualIndex].name;
-  document.getElementById('subtext').innerHTML = "Mode of Travel:<br/><div class='col m4 l4'></div><select id='mode' class='browser-default col s12 m4 l4'><option value='DRIVING'>Driving</option><option value='WALKING'>Walking</option><option value='BICYCLING'>Bicycling</option><option value='TRANSIT'>Transit</option></select>";
+  document.getElementById('subtext').innerHTML = "Mode of Travel:<br/><div class='col m4 l4'></div><select id='mode' class='browser-default col s12 m4 l4'><option value='DRIVING'>Driving</option><option value='WALKING'>Walking</option><option value='TRANSIT'>Transit</option></select>";
   initMap();
   $('#results').hide();
   $('#accepted').show();
@@ -394,10 +423,11 @@ function retryRec() {
   $('#select_card').show();
   $('#select_card2').show();
   $('#select_card3').show();
-  Materialize.toast('Bon appétit! Share your experience later! (Profile > History)', 10000, 'rounded');
+  Materialize.toast('Bon appétit! Share your experience later! (Profile > History)', 8000, 'rounded');
 }
 
 </script>
+<script src="{% static 'recommender/nouislider.min.js' %}"></script>
 <script async defer
     src="https://maps.googleapis.com/maps/api/js?key={{ googlekey }}">
     </script>
