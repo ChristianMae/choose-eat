@@ -68,7 +68,7 @@ def request(host, path, bearer_token, url_params=None):
 
     return response.json()
 
-def search(bearer_token, longitude, latitude, distance, term, categories):
+def search(bearer_token, longitude, latitude, distance, term, categories, price):
     """Query the Search API by a search term and location.
     Args:
         term (str): The search term passed to the API.
@@ -88,11 +88,13 @@ def search(bearer_token, longitude, latitude, distance, term, categories):
 
     if term:
         url_params['term'] = term.replace(' ', '+')
+    if price:
+        url_params['price'] = price
 
     return request(API_HOST, SEARCH_PATH, bearer_token, url_params=url_params)
 
 
-def query_api(longitude, latitude, distance=5000, term=None, categories='restaurants'):
+def query_api(longitude, latitude, distance=5000, term=None, categories='restaurants', price=None):
     """Queries the API by the input values from the user.
     Args:
         term (str): The search term to query.
@@ -101,5 +103,5 @@ def query_api(longitude, latitude, distance=5000, term=None, categories='restaur
     """
     bearer_token = obtain_bearer_token(API_HOST, TOKEN_PATH)
 
-    response = search(bearer_token, longitude, latitude, distance, term, categories)
+    response = search(bearer_token, longitude, latitude, distance, term, categories, price)
     return response

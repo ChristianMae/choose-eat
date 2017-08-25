@@ -195,7 +195,7 @@
 var index = 0;
 var restoList = {};
 var actualIndex = 0;
-var resultList;
+var resultList, lat, lng;
 var subtext = document.getElementById('subtext');
 var slider = document.getElementById('test-slider'); 
 
@@ -213,7 +213,7 @@ $(document).ready(function() {
    start: [1, 4],
    connect: true,
    step: 1,
-   orientation: 'horizontal', // 'horizontal' or 'vertical'
+   orientation: 'horizontal',
    range: {
      'min': 1,
      'max': 4
@@ -249,20 +249,27 @@ function showSoloRec() {
 }
 
 function getSoloResults(event) {
+  lat = document.getElementById('id_latitude').innerHTML;
+  lng = document.getElementById('id_longitude').innerHTML;
+
   var params = {
-    latitude: 7.0689124,
-    longitude: 125.6018725,
+    latitude: lat,
+    longitude: lng,
     uid: {{ user.id }},
     distance: $('#id_distance').val() * 1000
   };
 
   var priceRange = slider.noUiSlider.get();
   if (priceRange != '1,4') {
-    priceRange = priceRange.split(',');
-    console.log(priceRange);
-  } else {
-    console.log(priceRange)
-    console.log('fkn equal');
+    if (priceRange.length == 1) {
+      params.price = priceRange[0].toString();
+    } else {
+      var newRange = [];
+      for(var i = priceRange[0]; i <= priceRange[1]; i++) {
+        newRange.push(i);
+      }
+      params.price = newRange.join(', ');
+    } 
   }
 
   if (event.target.id === 'keyword_rec') {
@@ -303,11 +310,19 @@ function getSoloResults(event) {
 }
 
 function getLocation() {
+  var options = {
+    enableHighAccuracy: true,
+    timeout: 5000,
+    maximumAge: 0
+  };
+
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(function(position) {
       document.getElementById("id_latitude").innerHTML = ''+ position.coords.latitude;
-      document.getElementById("id_longitude").innerHTML = position.coords.longitude;
-    });
+      document.getElementById("id_longitude").innerHTML = ''+ position.coords.longitude;
+    }, function() {
+      alert("Please allow getting location, we won't be saving it but will be used to get nearby restaurants :(");
+    }, options);
   } else { 
     alert("Geolocation is not supported by this browser :( Try using a different browser or get the mobile app!");
   }
@@ -374,9 +389,11 @@ function acceptResto() {
 function initMap() {
   var directionsDisplay = new google.maps.DirectionsRenderer;
   var directionsService = new google.maps.DirectionsService;
+  lat = parseFloat(lat);
+  lng = parseFloat(lng);
   var map = new google.maps.Map(document.getElementById('map'), {
     zoom: 10,
-    center: {lat: 7.0689124, lng: 125.6018725}
+    center: {lat: lat, lng: lng}
   });
   directionsDisplay.setMap(map);
   directionsDisplay.setPanel(document.getElementById('right-panel'));
@@ -400,7 +417,7 @@ function calculateAndDisplayRoute(directionsService, directionsDisplay) {
   }
   
   directionsService.route({
-    origin: {lat: 7.0689124, lng: 125.6018725}, 
+    origin: {lat: lat, lng: lng}, 
     destination: dest,  
     travelMode: google.maps.TravelMode[selectedMode]
   }, function(response, status) {
