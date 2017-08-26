@@ -21,12 +21,12 @@
           {% for pcode, pval in preferences.items %}
             {% if code == pcode %}
               {% if pval == 0 %}
-              <a class="btn-floating halfway-fab waves-effect waves-light green center" id="{{ code }}2" href="#" onclick="storePreference(this.id);return false;"><i class="material-icons">check</i></a>
-              <a class="btn-floating halfway-fab waves-effect waves-light red left" id="{{ code }}1" href="#" onclick="storePreference(this.id);return false;"><i class="material-icons">not_interested</i></a>
+              <a class="btn-floating halfway-fab waves-effect waves-light green center" id="{{ code }}2" href="#" onclick="storePreference(this.id);return false;"><i class="fa fa-check"></i></a>
+              <a class="btn-floating halfway-fab waves-effect waves-light red left" id="{{ code }}1" href="#" onclick="storePreference(this.id);return false;"><i class="fa fa-remove"></i></a>
               {% elif pval == 1 %}
-              <a class="btn-floating halfway-fab waves-effect waves-light blue right" id="{{ code }}3" href="#" onclick="storePreference(this.id);return false;"><i class="material-icons">check</i></a>
+              <a class="btn-floating halfway-fab waves-effect waves-light blue right" id="{{ code }}3" href="#" onclick="storePreference(this.id);return false;"><i class="fa fa-check"></i></a>
               {% elif pval == -1 %}
-              <a class="btn-floating halfway-fab waves-effect waves-light blue left" id="{{ code }}3" href="#" onclick="storePreference(this.id);return false;"><i class="material-icons">not_interested</i></a>
+              <a class="btn-floating halfway-fab waves-effect waves-light blue left" id="{{ code }}3" href="#" onclick="storePreference(this.id);return false;"><i class="fa fa-remove"></i></a>
               {% endif %}
             {% else %}
             {% endif %}
@@ -45,7 +45,7 @@
   <div class="col s12 center">
     <br /><br />
     <div class="preloader-wrapper big active">
-      <div class="spinner-layer spinner-red-only center-align">
+      <div class="spinner-layer spinner center-align">
         <div class="circle-clipper left">
           <div class="circle"></div>
         </div><div class="gap-patch">
@@ -66,6 +66,11 @@ var ratings = {};
 
 $(document).ready(function(){
   $('#loading').hide();
+  {% if messages %}
+    {% for message in messages %}
+    Materialize.toast('{{ message }}', 3000, 'rounded');
+    {% endfor %}
+  {% endif %}
 });
 
 $(".button-collapse").sideNav();
@@ -89,15 +94,15 @@ function storePreference(buttonId) {
   switch(val) {
     case 1:
       ratings[cat] = -1;
-      document.getElementById('id_btns_' +cat).innerHTML = '<a class="btn-floating halfway-fab waves-effect waves-light blue left" id="' +cat+ '3" href="#" onclick="storePreference(this.id);return false;"><i class="material-icons">not_interested</i></a>';
+      document.getElementById('id_btns_' +cat).innerHTML = '<a class="btn-floating halfway-fab waves-effect waves-light blue left" id="' +cat+ '3" href="#" onclick="storePreference(this.id);return false;"><i class="fa fa-remove"></i></a>';
       break;
     case 2:
       ratings[cat] = 1;
-      document.getElementById('id_btns_' +cat).innerHTML = '<a class="btn-floating halfway-fab waves-effect waves-light blue right" id="' +cat+ '3" href="#" onclick="storePreference(this.id);return false;"><i class="material-icons">check</i></a>';
+      document.getElementById('id_btns_' +cat).innerHTML = '<a class="btn-floating halfway-fab waves-effect waves-light blue right" id="' +cat+ '3" href="#" onclick="storePreference(this.id);return false;"><i class="fa fa-check"></i></a>';
       break;
     case 3:
       ratings[cat] = 0;
-      document.getElementById('id_btns_' +cat).innerHTML = '<a class="btn-floating halfway-fab waves-effect waves-light green center" id="' +cat+ '2" href="#" onclick="storePreference(this.id);return false;"><i class="material-icons">check</i></a><a class="btn-floating halfway-fab waves-effect waves-light red left" id="' +cat+ '1" href="#" onclick="storePreference(this.id);return false;"><i class="material-icons">not_interested</i></a>'
+      document.getElementById('id_btns_' +cat).innerHTML = '<a class="btn-floating halfway-fab waves-effect waves-light green center" id="' +cat+ '2" href="#" onclick="storePreference(this.id);return false;"><i class="fa fa-check"></i></a><a class="btn-floating halfway-fab waves-effect waves-light red left" id="' +cat+ '1" href="#" onclick="storePreference(this.id);return false;"><i class="fa fa-remove"></i></a>'
       break;
   }
 }

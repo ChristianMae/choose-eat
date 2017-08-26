@@ -1,0 +1,62 @@
+{% extends 'users/base.html' %}
+
+{% load i18n %}
+{% load account socialaccount %}
+
+{% block title %}Choose-Eat | Sign Up{% endblock title %}
+
+{% block header %}Sign Up{% endblock header %}
+
+{% block subtext %}
+  <p>Already have an account? Then please <a href="{% url 'account_login' %}">log in.</a></p>
+
+  <a class="waves-effect waves-light btn social facebook" href="{% provider_login_url "facebook" process="login" %}" style="margin-top:15px;"><i class="fa fa-facebook"></i>Sign up with Facebook</a>
+  
+  <div class="divider" style="margin-top:40px;margin-bottom:-20px;"></div>
+
+  {% include "socialaccount/snippets/login_extra.html" %}
+{% endblock subtext %}
+
+{% block content %}
+  <ul class="red-text">
+    {{ form.non_field_errors }}
+  </ul>
+  {% if messages %}
+  <ul class="messages">
+    {% for message in messages %}
+    <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+
+  <form id="signup_form" method="post" action="/accounts/signup/">
+    {% csrf_token %}
+    <div class="row">
+      <div class="input-field col s12">
+        <small class="red-text">{{ form.username.errors }}</small>
+        <input type="text" name="username" minlength="8" id="id_username" placeholder="" autofocus="autofocus" maxlength="16" required="">
+        <label for="id_username" class="active">Username:</label>
+      </div>
+      <div class="input-field col s12">
+        <small class="red-text">{{ form.email.errors }}</small>
+        <input type="email" name="email" id="id_email" placeholder="">
+        <label for="id_email" class="active">E-mail (optional):</label>
+      </div>
+      <div class="input-field col s12">
+        <small class="red-text">{{ form.password1.errors }}</small>
+        <input type="password" name="password1" id="id_password1" placeholder="" required="">
+        <label for="id_password1" class="active">Password:</label>
+      </div>
+      <div class="input-field col s12">
+        <small class="red-text">{{ form.password2.errors }}</small>
+        <input type="password" name="password2" id="id_password2" placeholder="" required="">
+        <label for="id_password2" class="active">Password (again):</label>
+      </div>
+	  </div>
+    <input type="hidden" name="{{ redirect_field_name }}" value="{% url 'users:start_prefs' %}" />
+    <div class="form-actions">
+      <br>
+      <button class="btn black" type="submit"><i class="fa fa-sign-up left"></i>Submit</button>
+    </div>
+  </form>
+{% endblock %}

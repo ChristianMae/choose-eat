@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <title>{% block title %}{% endblock title %}</title>
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <script src="https://use.fontawesome.com/67b0e9c8df.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.1/css/materialize.min.css">
   <link href="https://fonts.googleapis.com/css?family=Chewy" rel="stylesheet">
   <link rel="stylesheet" href="{% static "recommender/styles.css" %}">
@@ -25,26 +25,29 @@
             <li><div class="user-view">
               <div class="background grey darken-4">
               </div>
-              <a href="#!user"><img class="circle" src="images/yuna.jpg"></a>
-              <a href="#!name"><span class="white-text name">{{ user.first_name }} {{ user.last_name }}</span></a>
-              <a href="#"><span class="white-text email">({{ user.username }})</span></a>
+              <a href="#!user"><img class="circle" src="{% if user.avatar_url %}{{ user.avatar_url }}{% else %}{% static 'recommender/default_avatar.jpg' %}{% endif %}"></a>
+              <a href="#!name"><span class="white-text name">{% if user.get_full_name %}{{ user.get_full_name }}{% else %}{{ user.username }}{% endif %}</span></a>
+              <a href="#"><span></span></a>
             </div></li>
-            <li><a href="#!" class="waves-effect"><i class="tiny material-icons">restaurant</i>Get recommendations</a></li>
+            <li><a href="{% url 'recommender:home' %}" class="waves-effect"><i class="fa fa-cutlery"></i>Get recommendations</a></li>
             <li><div class="divider"></div></li>
-            <li><a href="#!" class="waves-effect"><i class="tiny material-icons">account_circle</i>My Profile</a></li>
-            <li><a href="#!" class="waves-effect"><i class="tiny material-icons">settings</i>Account Settings</a></li>
+            <li><a href="#!" class="waves-effect"><i class="fa fa-user-circle"></i>My Profile</a></li>
+            <li><a href="#!" class="waves-effect"><i class="fa fa-gears"></i>Account Settings</a></li>
             <li><div class="divider"></div></li>
-            <li><a href="{% url 'users:logout' %}" class="waves-effect"><i class="tiny material-icons">power_settings_new</i>Logout</a></li>
+            <li><a href="{% url 'account_logout' %}" class="waves-effect"><i class="fa fa-sign-out"></i>Logout</a></li>
           </ul>
 
           <ul class="right hide-on-med-and-down">
-            <li><a href="#" class="dropdown-button otherfont smtext" data-activates='userMenu'>{{ user.username }}</a></li>
+            <div class="row dropdown-button" data-activates='userMenu'>
+              <img src="{% if user.avatar_url %}{{ user.avatar_url }}{% else %}{% static  'recommender/default_avatar.jpg' %}{% endif %}" class="circle responsive-img left" alt="{{ user.get_full_name }}" style="width:35px;height:35px;margin-top:15px;margin-right:15px;">
+              <li class="otherfont smtext">{% if user.get_full_name %}{{ user.get_full_name }}{% else %}{{ user.username }}{% endif %}</li>
+            </div>
 
             <ul id='userMenu' class='dropdown-content' >
-              <li><a href="#!" class="otherfont"><i class="tiny material-icons">person</i>Profile</a></li>
-              <li><a href="#!" class="otherfont"><i class="tiny material-icons">settings</i>Settings</a></li>
+              <li><a href="#!" class="otherfont"><i class="fa fa-user-circle"></i>Profile</a></li>
+              <li><a href="#!" class="otherfont"><i class="fa fa-gears"></i>Settings</a></li>
               <li class="divider"></li>
-              <li><a href="{% url 'users:logout' %}" class="otherfont"><i class="tiny material-icons">power_settings_new</i>Logout</a></li>
+              <li><a href="{% url 'account_logout' %}" class="otherfont"><i class="fa fa-sign-out"></i>Logout</a></li>
             </ul>
           </ul>
         </div>

@@ -44,34 +44,6 @@
   padding-left: 10px;
 }
 
-/* label color */
-.input-field label {
-  color: #800000;
-}
-/* label focus color */
-.input-field input[type=text]:focus + label {
-  color: #800000;
-}
-/* label underline focus color */
-.input-field input[type=text]:focus {
-  border-bottom: 1px solid #800000;
-  box-shadow: 0 1px 0 0 #800000;
-}
-/* valid color */
-.input-field input[type=text].valid {
-  border-bottom: 1px solid #800000;
-  box-shadow: 0 1px 0 0 #800000;
-}
-/* invalid color */
-.input-field input[type=text].invalid {
-  border-bottom: 1px solid #800000;
-  box-shadow: 0 1px 0 0 #800000;
-}
-/* icon prefix focus color */
-.input-field .prefix.active {
-  color: #800000;
-}
-
 .dropdown-content {
   background-color: rgba(0, 0, 0, 0);
   margin: 0;
@@ -162,3 +134,50 @@ main {
   flex: 1 0 auto;
 }
 
+.btn.social > :first-child,
+.btn-large.social > :first-child,
+.col.social > :first-child {
+  border-right: 1px solid rgba(0, 0, 0, 0.2);
+}
+.btn.social,
+.btn-large.social,
+.col.social {
+  padding: 0 2rem 0 0;
+}
+.btn.social i,
+.btn-large.social i,
+.col.social i {
+  padding: 0 1rem;
+  margin-right: 1rem;
+}
+.btn.social-icon,
+.btn-large.social-icon,
+.col.social-icon {
+  padding: 0;
+}
+.btn.social-icon i,
+.btn-large.social-icon i,
+.col.social-icon i {
+  padding: 0 1rem;
+  margin-right: 0;
+}
+.btn-large.social-icon {
+  padding: 0 1rem;
+}
+.col.social {
+  width: 100%;
+  text-align: left;
+}
+.col.social i.fa-fw {
+  width: 3.2rem;
+}
+.facebook {
+  background-color: #3b5998;
+  color: #fff !important;
+}
+.facebook i {
+  color: #fff !important;
+}
+.facebook:hover {
+  background-color: #4c70ba !important;
+}

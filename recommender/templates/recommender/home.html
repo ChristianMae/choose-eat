@@ -7,17 +7,18 @@
   <br />
 </div>
 <div class="row grey lighten-3">
-  <li><a href="{% url 'users:login' %}">Login</a></li>
-  <li><a href="{% url 'users:register' %}">Register</a></li>
+  <li><a href="{% url 'account_login' %}">Login</a></li>
+  <li><a href="{% url 'account_signup' %}">Register</a></li>
 </div>
 {% endblock mobile-menu %}
 
 {% block menu %}
-<li><a href="{% url 'users:login' %}" class="otherfont smtext">Login</a></li>
-<li><a href="{% url 'users:register' %}" class="otherfont smtext">Sign-up</a></li>
+<li><a href="{% url 'account_login' %}" class="otherfont smtext">Login</a></li>
+<li><a href="{% url 'account_signup' %}" class="otherfont smtext">Sign-up</a></li>
 {% endblock menu %}
 
 {% block content %}
+<span class="white-text" id="locations"><b id="id_latitude"></b><b id="id_longitude"></b></span>
 <ul id="about-items">
   <li style="opacity:0;"><h2 class="header otherfont">About</h2></li>
   <li style="opacity:0;"><p class="black-text" style="max-width: 1000px; word-wrap: break-word;">
@@ -53,7 +54,7 @@
   <div class="col s12 center">
     <br /><br />
     <div class="preloader-wrapper big active">
-      <div class="spinner-layer spinner-red-only center-align">
+      <div class="spinner-layer center-align">
         <div class="circle-clipper left">
           <div class="circle"></div>
         </div><div class="gap-patch">
@@ -83,9 +84,18 @@
 <div class="row" id="no-results">
   <div class="col s12 center">
     <br/>
-    <h4 class="otherfont">No results found for "<span id="usedterm"></span>". Try using a different keyword!</h4>
+    <h4><i class="fa fa-frown-o fa-2x"></i></h4>
+    <h4 class="otherfont">No results found for "<span id="usedterm"></span>".</h4>
+    <div class="container">
+      <small>
+        <ul>
+          <li>- Try using another keyword -</li>
+          <li>- Else, you may be in a place where there are no restaurants around -</li>
+        </ul>
+      </small>
+    </div>
     <br/>
-    <a class="waves-effect waves-light btn-large black otherfont" href="javascript:retryRec();"><i class="material-icons left">find_replace</i>Try Again</a>
+    <a class="waves-effect waves-light btn-large black otherfont" href="javascript:retryRec();"><i class="fa fa-thumbs-up left"></i>Try Again</a>
   </div>
 </div>
 
@@ -95,7 +105,7 @@
     <div id="right-panel" class="col s12 m6 l6" style="height:500px;"></div>
   </div>
   <div class="row center-align">
-    <a class="waves-effect waves-light btn-large green otherfont" href="javascript:retryRec();"><i class="material-icons left">thumb_up</i>I'm here</a>
+    <a class="waves-effect waves-light btn-large green otherfont" href="javascript:retryRec();"><i class="fa fa-thumbs-up left"></i>I'm here</a>
   </div>
 </div>
 {% endblock content %}
@@ -109,8 +119,6 @@
         <div class="row" style="z-index: 999;margin-left:60px;left:5px;margin-bottom:0;">                            
           <div class="input-field">
             <input type="text" class="col s9" id="id_term2" name="term" placeholder="What are you looking to eat?" maxlength="200" autocomplete=off required />
-            <input type="hidden" id="id_latitude" name="latitude" value="0" />
-            <input type="hidden" id="id_longitude" name="longitude" value="0" />
           </div>            
         </div>
         
@@ -132,8 +140,6 @@
         <div class="row">		                         
           <div class="input-field">
             <input type="text" class="col m9 l8" id="id_term" name="term" placeholder="What are you looking to eat?" maxlength="200" autocomplete=off required />
-            <input type="hidden" id="id_latitude" name="latitude" />
-            <input type="hidden" id="id_longitude" name="longitude" />
             <input class="btn black waves-effect waves-light tooltipped" type="submit" name="action" value="Submit" data-position="bottom" data-tooltip="Get better recommendations when you sign-up!" style="left:30px;top:10px;"/> 
           </div>            
         </div>
@@ -148,16 +154,23 @@
 var index = 0;
 var restoList = {};
 var actualIndex = 0;
-var resultList;
+var resultList, lat, lng;
 var subtext = document.getElementById('subtext'); 
 
 $(document).ready(function() {
   getLocation();
+  $('#locations').hide();
   $('#header_text').hide();
   $('#loading').hide();
   $('#results').hide();
   $('#no-results').hide();
   $('#accepted').hide();
+
+  {% if messages %}
+    {% for message in messages %}
+    Materialize.toast('{{ message }}', 3000, 'rounded');
+    {% endfor %}
+  {% endif %}
 });
 
 $('#trial_rec').on('submit', function(e) {
@@ -170,22 +183,19 @@ $('#trial_rec2').on('submit', function(e) {
 });
 
 function showTrialRec() {
+  lat = document.getElementById('id_latitude').innerHTML;
+  lng = document.getElementById('id_longitude').innerHTML;
+
   $('#about-items').hide();
   $('#card_form').hide();
   $('#card_form2').hide();
   $('#header_text').show();
   
   var params = {
-    latitude: $('#id_latitude').val(),
-    longitude: $('#id_longitude').val(),
+    latitude: lat,
+    longitude: lng,
     term: $('#id_term').val()
   };
-
-  // var params = {
-  //   latitude: 7.0689124,
-  //   longitude: 125.6018725,
-  //   term: $('#id_term').val()
-  // };
 
   document.getElementById('id_term').value=null;
   document.getElementById('id_term2').value=null;
@@ -226,11 +236,19 @@ function showTrialRec() {
 }
 
 function getLocation() {
+  var options = {
+    enableHighAccuracy: true,
+    timeout: 5000,
+    maximumAge: 0
+  };
+
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(function(position) {
-      document.getElementById("id_latitude").value = position.coords.latitude;
-      document.getElementById("id_longitude").value = position.coords.longitude;
-    });
+      document.getElementById("id_latitude").innerHTML = '' +position.coords.latitude;
+      document.getElementById("id_longitude").innerHTML = '' +position.coords.longitude;
+    }, function() {
+      alert("Please allow getting location, we won't be saving it but will be used to get nearby restaurants :(");
+    }, options);
   } else { 
     alert("Geolocation is not supported by this browser :( Try using a different browser or get the mobile app!");
   }
@@ -289,9 +307,11 @@ function acceptResto() {
 function initMap() {
   var directionsDisplay = new google.maps.DirectionsRenderer;
   var directionsService = new google.maps.DirectionsService;
+  lat = parseFloat(lat);
+  lng = parseFloat(lng);
   var map = new google.maps.Map(document.getElementById('map'), {
     zoom: 10,
-    center: {lat: 7.0689124, lng: 125.6018725}
+    center: {lat: lat, lng: lng}
   });
   directionsDisplay.setMap(map);
   directionsDisplay.setPanel(document.getElementById('right-panel'));
@@ -315,7 +335,7 @@ function calculateAndDisplayRoute(directionsService, directionsDisplay) {
   }
   
   directionsService.route({
-    origin: {lat: 7.0689124, lng: 125.6018725}, 
+    origin: {lat: lat, lng: lng}, 
     destination: dest,  
     travelMode: google.maps.TravelMode[selectedMode]
   }, function(response, status) {
@@ -337,7 +357,9 @@ function retryRec() {
   $('#about-items').show();
   $('#card_form').show();
   $('#card_form2').show();
-  Materialize.toast('Sign up to get better recommendations and access more features!', 10000, 'rounded');
+  document.getElementById('right-panel').innerHTML = '';
+  index = 0;
+  Materialize.toast('Sign up to get better recommendations and access more features!', 8000, 'rounded');
 }
 
 </script>

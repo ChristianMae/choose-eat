@@ -1,15 +1,23 @@
 import json
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.dispatch import receiver
 from django.core import serializers
 from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
-from django.contrib.auth import login as log_in, logout, authenticate
-from django.contrib import messages
-from django.contrib.auth.views import login as login_view
+from allauth.account.signals import user_signed_up
+from allauth.socialaccount.models import SocialAccount
 from rest_framework.views import APIView
-from ceat.settings import CATEGORY_DICT
-from .forms import UserCreationForm
+from ceat.settings import CATEGORY_DICT, MY_URL
 from .models import User
+
+
+@receiver(user_signed_up)
+def social_profilepic(user, **kwargs):
+    socialaccount = SocialAccount.objects.filter(user=user)
+    if socialaccount:
+        picture_url = "http://graph.facebook.com/{0}/picture?width={1}&height={1}".format(socialaccount[0].uid, 256)
+        user.avatar_url = picture_url
+        user.save()
 
 
 class login(APIView):
@@ -89,7 +97,7 @@ class setPreferences(APIView):
     """
     def post(self, request, format=None):
         """
-        Returns restaurant recommendation based on anonymous user's given term
+        Sets user preferences, then returns the changes
         """
         try:
             uid = int(self.request.data.get('uid'))
@@ -107,60 +115,20 @@ class setPreferences(APIView):
         return HttpResponse(json.dumps({'uid': uid, 'ratings': ratings}), content_type="application/json")
 
 
-def register(request):
+def startPrefs(request):
     if request.user.is_authenticated:
-         return HttpResponseRedirect(reverse('recommender:home'))
-    elif request.method == 'POST':
-        form = UserCreationForm(data=request.POST)
-
-        if request.POST['username'] != '' and request.POST['password1'] != '' and request.POST['password2'] != '':
-            if len(request.POST['username']) < 8:
-                messages.error(request, 'Username should be at least 8 characters')
-            elif len(request.POST['username']) > 16:
-                messages.error(request, 'Username can only be up to 16 characters')
-            elif form.is_valid():
-                new_user = form.save(commit=False)
-                new_user.first_name = request.POST['first_name'].title()
-                new_user.last_name = request.POST['last_name'].title()
-                new_user.save()
-                authenticated_user = authenticate(username=new_user.username, password=request.POST['password1'])
-                log_in(request, authenticated_user)
-                return HttpResponseRedirect(reverse('users:start_prefs'))
+        user_prefs = eval(request.user.preferences)
+        categories = {'Asian Fusion': 'asianfusion', 'Barbeque': 'bbq', 'Bistros': 'bistros', 'Cafes': 'cafes', 'Chicken': 'chickenshop', 'Chinese': 'chinese', 'Filipino': 'filipino', 'Italian': 'italian', 'Japanese': 'japanese', 'Korean': 'korean', 'Mexican': 'mexican', 'Noodles': 'noodles', 'Pizza': 'pizza', 'Seafood': 'seafood', 'Steakhouses': 'steak', 'Vegetarian': 'vegetarian'}
+        for key, value in categories.items():
+            if user_prefs[value] in (-1, 1):
+                return HttpResponseRedirect(reverse('recommender:home'))
         else:
-            messages.error(request, 'You left one or more required field(s) blank')
-            
-    else:
-        form = UserCreationForm()
-
-    context = {'form': form}
-    return render(request, 'users/register.html', context)
-
-
-def custom_login(request):
-    if request.user.is_authenticated:
-        return HttpResponseRedirect(reverse('recommender:home'))     
-    else:
-        return login_view(request, template_name='users/login.html')
-
-
-def logout_view(request):
-    if request.user.is_authenticated:
-        logout(request)
-    
-    return HttpResponseRedirect(reverse('recommender:home'))
-
-
-def prefs_view(request):
-    if request.user.is_authenticated:
-        print(request.META.get('HTTP_REFERER'))
-        return render(request, template_name='users/start_prefs.html', context={'categories': CATEGORY_DICT})
-    
-    return HttpResponseRedirect(reverse('recommender:home'))
+            return render(request, template_name='users/start_prefs.html', context={'categories': categories, 'MY_URL': MY_URL})
+    return redirect(reverse('account_login')+'?next=/starting_preferences/')
 
 
 def settings_prefs(request):
-    user_prefs = eval(User.objects.get(pk=request.user.id).preferences)
     if request.user.is_authenticated:
+        user_prefs = eval(request.user.preferences)
         return render(request, template_name='users/settings_prefs.html', context={'categories': CATEGORY_DICT, 'preferences': user_prefs})
-    
-    return HttpResponseRedirect(reverse('recommender:home'))
+    return redirect(reverse('account_login')+'?next=/preferences/')

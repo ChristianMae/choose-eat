@@ -5,16 +5,15 @@
 <li><div class="user-view">
   <div class="background grey darken-4">
   </div>
-  <a href="#!user"><img class="circle" src="images/yuna.jpg"></a>
-  <a href="#!name"><span class="white-text name">{{ user.first_name }} {{ user.last_name }}</span></a>
-  <a href="#"><span class="white-text email">({{ user.username }})</span></a>
+  <a href="#!user"><img class="circle" src="{% if user.avatar_url %}{{ user.avatar_url }}{% else %}{% static  'recommender/default_avatar.jpg' %}{% endif %}"></a>
+  <a href="#!name"><span class="white-text name">{% if user.get_full_name %}{{ user.get_full_name }}{% else %}{{ user.username }}{% endif %}</span></a>
 </div></li>
-<li><a href="{% url 'recommender:home' %}" class="waves-effect"><i class="tiny material-icons">restaurant</i>Get recommendations</a></li>
+<li><a href="{% url 'recommender:home' %}" class="waves-effect"><i class="fa fa-cutlery"></i>Get recommendations</a></li>
 <li><div class="divider"></div></li>
-<li><a href="#!" class="waves-effect"><i class="tiny material-icons">account_circle</i>My Profile</a></li>
-<li><a href="#!" class="waves-effect"><i class="tiny material-icons">settings</i>Account Settings</a></li>
+<li><a href="#!" class="waves-effect"><i class="fa fa-user-circle"></i>My Profile</a></li>
+<li><a href="#!" class="waves-effect"><i class="fa fa-gears"></i>Account Settings</a></li>
 <li><div class="divider"></div></li>
-<li><a href="{% url 'users:logout' %}" class="waves-effect"><i class="tiny material-icons">power_settings_new</i>Logout</a></li>
+<li><a href="{% url 'account_logout' %}" class="waves-effect"><i class="fa fa-sign-out"></i>Logout</a></li>
 {% endblock mobile-menu %}
 
 {% block headercard %}
@@ -23,9 +22,9 @@
   <div class="col s12 l6">
     <div class="form-container center-align" style="padding-bottom: 20px;">
       <br />
-      <a class="waves-effect waves-light btn-large black" style="width: 175px;" href="javascript:showSoloRec();"><i class="material-icons left">person</i>Solo</a>
+      <a class="waves-effect waves-light btn-large black" style="width: 175px;" href="javascript:showSoloRec();"><i class="fa fa-user left"></i>Solo</a>
       <h3 class="otherfont shadowed">OR</h3>
-	  <a class="waves-effect waves-light btn-large black" style="width: 175px;" href="#"><i class="material-icons left">group</i>Group</a>
+	  <a class="waves-effect waves-light btn-large black" style="width: 175px;" href="#"><i class="fa fa-group left"></i>Group</a>
       <br />
     </div>
   </div>
@@ -36,9 +35,9 @@
   <div class="col s12 l6">
     <div class="form-container center-align" style="padding-bottom: 20px;">
       <br />
-      <a class="waves-effect waves-light btn-large black" style="width: 175px;" href="javascript:showSoloRec();"><i class="material-icons left">person</i>Solo</a>
+      <a class="waves-effect waves-light btn-large black" style="width: 175px;" href="javascript:showSoloRec();"><i class="fa fa-user left"></i>Solo</a>
       <h3 class="otherfont shadowed">OR</h3>
-	  <a class="waves-effect waves-light btn-large black" style="width: 175px;" href="#"><i class="material-icons left">group</i>Group</a>
+	  <a class="waves-effect waves-light btn-large black" style="width: 175px;" href="#"><i class="fa fa-group left"></i>Group</a>
       <br />
     </div>
   </div>
@@ -49,9 +48,9 @@
   <div class="col s12 l6">
     <div class="form-container center-align" style="padding-bottom: 20px;">
       <br />
-      <a class="waves-effect waves-light btn-large black" style="width: 175px;" href="javascript:showSoloRec();"><i class="material-icons left">person</i>Solo</a>
+      <a class="waves-effect waves-light btn-large black" style="width: 175px;" href="javascript:showSoloRec();"><i class="fa fa-user left"></i>Solo</a>
       <h3 class="otherfont shadowed">OR</h3>
-	  <a class="waves-effect waves-light btn-large black" style="width: 175px;" href="#"><i class="material-icons left">group</i>Group</a>
+	  <a class="waves-effect waves-light btn-large black" style="width: 175px;" href="#"><i class="fa fa-group left"></i>Group</a>
       <br />
     </div>
   </div>
@@ -59,13 +58,16 @@
 {% endblock %}
 
 {% block menu %}
-<li><a href="#" class="dropdown-button otherfont smtext" data-activates='userMenu'>{{ user.username }}</a></li>
+<div class="row dropdown-button" data-activates='userMenu'>
+  <img src="{% if user.avatar_url %}{{ user.avatar_url }}{% else %}{% static  'recommender/default_avatar.jpg' %}{% endif %}" class="circle responsive-img left" alt="{{ user.get_full_name }}" style="width:35px;height:35px;margin-top:15px;margin-right:15px;">
+  <li class="otherfont smtext">{% if user.get_full_name %}{{ user.get_full_name }}{% else %}{{ user.username }}{% endif %}</li>
+</div>
 
 <ul id='userMenu' class='dropdown-content' >
-  <li><a href="#!" class="otherfont"><i class="tiny material-icons">person</i>Profile</a></li>
-  <li><a href="#!" class="otherfont"><i class="tiny material-icons">settings</i>Settings</a></li>
+  <li><a href="#!" class="otherfont"><i class="fa fa-user-circle"></i>Profile</a></li>
+  <li><a href="#!" class="otherfont"><i class="fa fa-gears"></i>Settings</a></li>
   <li class="divider"></li>
-  <li><a href="{% url 'users:logout' %}" class="otherfont"><i class="tiny material-icons">power_settings_new</i>Logout</a></li>
+  <li><a href="{% url 'account_logout' %}" class="otherfont"><i class="fa fa-sign-out"></i>Logout</a></li>
 </ul>
 {% endblock %}
 
@@ -105,14 +107,14 @@
 <div class="row" id="preSoloRec">
   <div class="container">
     <div class="col s12">
-      <h5 class="otherfont">How far are you willing to go? (km)</h5>
+      <h5 class="otherfont"><i class="fa fa-sliders left"></i>How far are you willing to go? (km)</h5>
       <form action="#">
         <p class="range-field">
           <input type="range" id="id_distance" min="1" max="40" value="5" />
           <small style="margin-bottom: 100px;">Higher search distance will most likely result to more results! (Default: 5 km)</small>
         </p>
       </form>
-      <h5 class="otherfont">Price levels:</h5>
+      <h5 class="otherfont"><i class="fa fa-money left"></i>Price levels:</h5>
       <div id="test-slider" style="margin-top: 25px;margin-bottom: 15px;"></div>
       <p><small style="margin-bottom: 100px;">Setting a price range other than the default might cause exclusion of some restaurants or lesser results. (Default: 1-4)</small></p>
     </div>
@@ -132,7 +134,7 @@
       <h3 class="otherfont center-align">OR</h3>
     </div>
     <div class="col s12 m5 l5 center-align">
-      <a id="nkey_rec" class="waves-effect waves-light btn-large black otherfont pulse" style="margin-top: 6px;"><i class="material-icons left">restaurant_menu</i>Dazzle Me!</a>
+      <a id="nkey_rec" class="waves-effect waves-light btn-large black otherfont pulse" style="margin-top: 6px;"><i class="fa fa-cutlery left"></i>Dazzle Me!</a>
       <br /><br />
       <small>Not really looking for anything specific, but just want awesome food that'll match your taste? Leave it to us!</small> <br/>
     </div>
@@ -143,7 +145,7 @@
   <div class="col s12 center">
     <br /><br />
     <div class="preloader-wrapper big active">
-      <div class="spinner-layer spinner-red-only center-align">
+      <div class="spinner-layer spinner center-align">
         <div class="circle-clipper left">
           <div class="circle"></div>
         </div><div class="gap-patch">
@@ -164,18 +166,28 @@
     <h4 id="resto-name" class="otherfont"></h3>
     <p id="resto-address"></p>
     <span class="center-align"><small id="resto-distance"></small> | <small id="resto-categories"></small></span><br /><br />
-    <a class="btn-floating btn-large waves-effect waves-light red" href="javascript:nextResto();"><i class="material-icons">not_interested</i></a>
-    <a class="btn-floating btn-large waves-effect waves-light blue" href="javascript:previousResto();"><i class="material-icons">replay</i></a>
-    <a class="btn-floating btn-large waves-effect waves-light green" href="javascript:acceptResto();"><i class="material-icons">check</i></a>
+    <a class="btn-floating btn-large waves-effect waves-light red" href="javascript:nextResto();"><i class='fa fa-remove'></i></a>
+    <a class="btn-floating btn-large waves-effect waves-light blue" href="javascript:previousResto();"><i class='fa fa-rotate-left'></i></a>
+    <a class="btn-floating btn-large waves-effect waves-light green" href="javascript:acceptResto();"><i class='fa fa-check'></i></a>
   </div>
 </div>
 
 <div class="row" id="no-results">
   <div class="col s12 center">
     <br/>
-    <h4 class="otherfont">No results found for "<span id="usedterm"></span>". Try using a different keyword!</h4>
+    <h4><i class="fa fa-frown-o fa-2x"></i></h4>
+    <h4 id="noRes_head" class="otherfont">No results found for "<span id="usedterm"></span>".</h4>
+    <div class="container">
+      <small>
+        <ul>
+          <li id="noRes_newkey">- Try using another keyword -</li>
+          <li>- Set the distance meter to a higher value, or the price level to a wider range -</li>
+          <li>- Else, you may be in a place where there are no restaurants around -</li>
+        </ul>
+      </small>
+    </div>
     <br/>
-    <a class="waves-effect waves-light btn-large black otherfont" href="javascript:retryRec();"><i class="material-icons left">find_replace</i>Try Again</a>
+    <a class="waves-effect waves-light btn-large black otherfont" href="javascript:retryRec();" id="id_noResRetry"><i class="fa fa-search left"></i>Try Again</a>
   </div>
 </div>
 
@@ -185,7 +197,7 @@
     <div id="right-panel" class="col s12 m6 l6" style="height:500px;"></div>
   </div>
   <div class="row center-align">
-    <a class="waves-effect waves-light btn-large green otherfont" href="javascript:retryRec();"><i class="material-icons left">thumb_up</i>I'm here</a>
+    <a class="waves-effect waves-light btn-large green otherfont" href="javascript:Materialize.toast('Bon appétit! Share your experience later! (Profile > History)', 5000, 'rounded');retryRec();"><i class="fa fa-thumbs-up left"></i>I'm here</a>
   </div>
 </div>
 {% endblock content %}
@@ -208,6 +220,12 @@ $(document).ready(function() {
   $('#results').hide();
   $('#no-results').hide();
   $('#accepted').hide();
+
+  {% if messages %}
+    {% for message in messages %}
+    Materialize.toast('{{ message }}', 3000, 'rounded');
+    {% endfor %}
+  {% endif %}
 
   noUiSlider.create(slider, {
    start: [1, 4],
@@ -240,6 +258,7 @@ function showSoloRec() {
 
   document.getElementById('hdr').innerHTML = "Solo Recommendation";
   document.getElementById('hdr2').innerHTML = "Solo Recommendation";
+  document.getElementById('subtext').innerHTML = 'Alone but not lonely! <i class="fa fa-smile-o"></i>';
   $('#header_text').show();
   $('#preSoloRec').show();
   
@@ -299,7 +318,13 @@ function getSoloResults(event) {
       restoList = response;
       console.log(restoList);
       if (restoList.likes.length == 0 && restoList.semilikes.length == 0 && restoList.others.length == 0 && restoList.dislikes.length == 0) {
-        document.getElementById('usedterm').innerHTML = params.term;
+        if (event.target.id === 'keyword_rec') {
+          document.getElementById('usedterm').innerHTML = params.term;
+        }
+        else {
+          document.getElementById('noRes_head').innerHTML = 'No results found!';
+          document.getElementById('noRes_newkey').innerHTML = '';
+        }
         $('#no-results').show();
       } else {
         nextResto();
@@ -440,7 +465,9 @@ function retryRec() {
   $('#select_card').show();
   $('#select_card2').show();
   $('#select_card3').show();
-  Materialize.toast('Bon appétit! Share your experience later! (Profile > History)', 8000, 'rounded');
+
+  document.getElementById('right-panel').innerHTML = '';
+  index = 0;
 }
 
 </script>

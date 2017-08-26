@@ -1,0 +1,58 @@
+{% extends 'users/base.html' %}
+
+{% load i18n %}
+{% load account socialaccount %}
+
+{% block title %}Choose-Eat | Login{% endblock title %}
+
+{% block header %}Login{% endblock header %}
+
+{% block subtext %}
+  <p>{% blocktrans with site.name as site_name %}Don't have an account? Continue with Facebook or <a href="{{ signup_url }}">sign up</a> for a {{ site_name }} account and sign in.{% endblocktrans %}</p>
+
+  <a class="waves-effect waves-light btn social facebook" href="{% provider_login_url "facebook" process="login" %}" style="margin-top:15px;"><i class="fa fa-facebook"></i>Sign in with Facebook</a>
+  
+  <div class="divider" style="margin-top:40px;margin-bottom:-20px;"></div>
+
+  {% include "socialaccount/snippets/login_extra.html" %}
+{% endblock subtext %}
+
+{% block content %}
+  <ul class="red-text">
+    {{ form.non_field_errors }}
+  </ul>
+  {% if messages %}
+  <ul class="messages">
+    {% for message in messages %}
+    <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+
+  <form class="login" method="POST" action="{% url 'account_login' %}">
+    {% csrf_token %}
+    <div class="row">
+      <div class="input-field col s12">
+        <input type="text" name="login" required="" placeholder="" id="id_login">
+        <label for="id_login" class="active">Username or E-mail:</label>
+      </div>
+      <div class="input-field col s12">
+        <input type="password" name="password" required="" placeholder="" id="id_password">
+        <label for="id_password" class="active">Password:</label>
+        <small><a href="{% url 'account_reset_password' %}">Forgot Password?</a></small>
+      </div>
+    </div>
+    <p>
+    <input type="checkbox" name="remember" id="id_remember">
+    <label for="id_remember" class="active">Remember me</label>   
+    </p> 
+    {% if redirect_field_value %}
+    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+    {% endif %}
+    
+    <div class="form-actions">
+      <br />
+      <button class="btn black" type="submit"><i class="fa fa-sign-in left"></i>{% trans "Sign In" %}</button>
+    </div>
+  </form>
+{% endblock %}

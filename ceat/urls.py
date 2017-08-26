@@ -14,6 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
 from django.conf.urls import url, include
+from django.contrib.auth.views import logout as logout_view
 from django.contrib import admin
 from rest_framework import routers, serializers, viewsets
 from rest_framework_swagger.views import get_swagger_view
@@ -63,5 +64,7 @@ urlpatterns = [
     url(r'^api/registration', registration.as_view()),
     url(r'', include('recommender.urls', namespace='recommender')),
     url(r'', include('users.urls', namespace='users')),
-    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))
+    url(r'^accounts/logout/$', logout_view, {'next_page': '/'}),
+    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    url(r'^accounts/', include('allauth.urls')),
 ]
