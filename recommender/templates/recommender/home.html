@@ -260,7 +260,7 @@ function nextResto() {
     resultList = restoList.likes;
     subtext.innerHTML = "You'll surely love these!"
   } else if (index-restoList.likes.length < restoList.others.length) {
-    actualIndex = index-restoList.likes.length-restoList.semilikes.length;
+    actualIndex = index-restoList.likes.length;
     resultList = restoList.others;
     subtext.innerHTML = "Try these ones out!"
   } else {

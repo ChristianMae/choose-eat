@@ -88,6 +88,11 @@
   padding: 12px 14px;
 }
 
+.tabs .indicator {
+    color: black;
+    background-color: black;
+}
+
 .logofontbold {
   font-family: FreeStyleScript;
   font-weight: bold;
