@@ -35,7 +35,9 @@
 	  		<div class="col m3 hide-on-large-only">
 	  		</div>
 	  		<div class="col l6 hide-on-med-and-down">
-	  		image here
+	  		  <div class="row" style="margin-top: -150px;margin-left: -50px;">
+	  		  <img src="{% static 'recommender/side-img.png' %}">
+	  		  </div>
 	  		</div>
 	  		<div class="col s12 m6 l6">
 	  		  {% block content %}{% endblock %}
@@ -45,24 +47,25 @@
     </main>
 
     <footer class="page-footer grey darken-4" id="connect">
-      <div class="container">
-        <div class="row">
-          <div class="col s12 l4" style="overflow: hidden;">
-            <h5 class="white-text">Yeah</h5> 
-            <p class="white-text">Yeah</p>
-          </div>
+	  <div class="container otherfont shadowed">
+	    <div class="row">
+	      <div class="col s12 l8" style="overflow: hidden;">
+	        <h5 class="white-text"><i class="fa fa-code left"></i>Developers' Notes</h5> 
+	        <p class="white-text">Restaurant data, including preview images and location, are retrieved from <a href="https://www.yelp.com/developers/documentation/v3/" class="white-text"><i class="fa fa-yelp red-text"></i> Yelp</a>. If there are missing estrablishments, please submit them <a href="https://biz.yelp.com/signup_business/new?utm_content=add_business_as_owner&utm_medium=www&utm_source=search_page&utm_campaign=add_business">here.</a> Also, please allow getting location, as this will be used to retrieve nearby restaurants, and won't be used for any other purpose.</p>
+	      </div>
 
-          <div class="col s12 l4" style="overflow: hidden;">
-            <h5 class="white-text">Yeah2</h5> 
-            <p class="white-text">Yeah2</p>
-          </div>
-
-          <div class="col s12 l4" style="overflow: hidden;">
-            <h5 class="white-text">Yeah3</h5> 
-            <p class="white-text">Yeah3</p>
-          </div>
-        </div>
-      </div>
+	      <div class="col s12 l4" style="overflow: hidden;">
+	        <h5 class="white-text"><i class="fa fa-graduation-cap left"></i>Capstone Project</h5> 
+	        <p class="white-text">
+	          <ul>
+	            <li>Sam B. Benemerito</li>
+	            <li>Isaiah Ganiel L. Bontia</li>
+	            <li>Rayvince Clark U. Parages</li>
+	          </ul>
+	        </p>
+	      </div>
+	    </div>
+	  </div>
       <div class="footer-copyright black">
         <div class="container">
         © 2017

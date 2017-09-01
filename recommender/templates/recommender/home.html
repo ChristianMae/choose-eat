@@ -18,30 +18,6 @@
 {% endblock menu %}
 
 {% block content %}
-<span class="white-text" id="locations"><b id="id_latitude"></b><b id="id_longitude"></b></span>
-<ul id="about-items">
-  <li style="opacity:0;"><h2 class="header otherfont">About</h2></li>
-  <li style="opacity:0;"><p class="black-text" style="max-width: 1000px; word-wrap: break-word;">
-    <i>dock</i> &emsp;|&emsp;/däk/&emsp;|&emsp;verb&emsp;|<br/> - to cut short <br/> - to take away a part of
-	<br />
-	<small>(From <a href="https://www.merriam-webster.com/dictionary/dock">Merriam-Webster's 3rd definition</a>)</small>
-	<br /><br />
-	<b><i>Dock</i> is basically yet another URL shortener, similar to <a href="https://bitly.com/">Bitly</a>.
-	<br /><br />
-	Turn a long URL like this:
-	<br />
-	https://www.youtube.com/watch?v=QslJYDX3o8s&amp;list=PLBDeA3o056yyMUiRG3xCXaSDan_bGG-Ho
-	<br /><br />
-	Into something like this:
-	<br />
-	http://dockr.herokuapp.com/a5dfmp
-	<br /><br />
-	This way, links are more manageable, easier to share, and kept secret. 
-	<br />
-	Dock is a school project, made with the use of <a href="https://www.djangoproject.com/">Django</a> and <a href="http://materializecss.com/">MaterializeCSS</a>.</b>
-  </p></li>
-</ul>
-
 <div class="row" id="header_text">
   <div class="col s12">
     <h3 id="hdr" class="otherfont center-align hide-on-med-and-up">Trial Recommendation</h3>
@@ -70,14 +46,14 @@
 
 <div class="row" id="results">
   <div class="col s12 center">
-    <img id="resto-img" class="z-depth-4 hide-on-small-only" style="border: 3px solid black; height:250px;width:350px; border-radius: 35%;" src=""/>
-    <img id="resto-img2" class="z-depth-4 hide-on-med-and-up" style="border: 3px solid black; height:200px;width:250px; border-radius: 35%;" src=""/>
+    <a id="resto-link" href=""><img id="resto-img" class="z-depth-4 hide-on-small-only" style="border: 3px solid black; height:250px;width:350px; border-radius: 35%;" src=""/>
+    <img id="resto-img2" class="z-depth-4 hide-on-med-and-up" style="border: 3px solid black; height:200px;width:250px; border-radius: 35%;" src=""/></a>
     <h4 id="resto-name" class="otherfont"></h3>
     <p id="resto-address"></p>
     <span class="center-align"><small id="resto-distance"></small> | <small id="resto-categories"></small></span><br /><br />
-    <a class="btn-floating btn-large waves-effect waves-light red" href="javascript:nextResto();"><i class="material-icons">not_interested</i></a>
-    <a class="btn-floating btn-large waves-effect waves-light blue" href="javascript:previousResto();"><i class="material-icons">replay</i></a>
-    <a class="btn-floating btn-large waves-effect waves-light green" href="javascript:acceptResto();"><i class="material-icons">check</i></a>
+    <a class="btn-floating btn-large waves-effect waves-light red" href="javascript:nextResto();"><i class='fa fa-remove'></i></a>
+    <a class="btn-floating btn-large waves-effect waves-light blue" href="javascript:previousResto();"><i class='fa fa-rotate-left'></i></a>
+    <a class="btn-floating btn-large waves-effect waves-light green" href="javascript:acceptResto();"><i class='fa fa-check'></i></a>
   </div>
 </div>
 
@@ -111,7 +87,7 @@
 {% endblock content %}
 
 {% block headercard %}
-<div class="row hide-on-med-and-up" style="position:relative;top:-65rem;" id="card_form2">
+<div class="row hide-on-med-and-up" style="position:relative;top:-100rem;" id="card_form2">
   <div class="col s12">
     <div class="form-container otherfont">
       <form id="trial_rec2">
@@ -131,7 +107,23 @@
   </div>
 </div>  
 
-<div class="row hide-on-small-only otherfont" style="position:relative;top:-55rem;" id="card_form">
+<div class="row hide-on-small-only hide-on-large-only" style="position:relative;top:-66rem;" id="card_form3">
+  <div class="col m12">
+    <div class="form-container">
+      <form id="trial_rec3" style="z-index: 999;margin-left:60px;left:5px">
+        {% csrf_token %}
+        <div class="row">                            
+          <div class="input-field otherfont">
+            <input type="text" class="col m9 l8" id="id_term" name="term" placeholder="What are you looking to eat?" maxlength="200" autocomplete=off required />
+            <input class="btn black waves-effect waves-light tooltipped" type="submit" name="action" value="Submit" data-position="bottom" data-tooltip="Get better recommendations when you sign-up!" style="left:30px;top:10px;"/> 
+          </div>            
+        </div>
+     </form>
+    </div>
+  </div>
+</div>  
+
+<div class="row hide-on-med-and-down otherfont" style="position:relative;top:-58.5rem;" id="card_form">
   <div class="col l3"></div>
   <div class="col s12 l6">
     <div class="form-container">
@@ -178,6 +170,10 @@ $('#trial_rec').on('submit', function(e) {
   showTrialRec();
 });
 $('#trial_rec2').on('submit', function(e) {
+  e.preventDefault();
+  showTrialRec();
+});
+$('#trial_rec3').on('submit', function(e) {
   e.preventDefault();
   showTrialRec();
 });
@@ -247,7 +243,7 @@ function getLocation() {
       document.getElementById("id_latitude").innerHTML = '' +position.coords.latitude;
       document.getElementById("id_longitude").innerHTML = '' +position.coords.longitude;
     }, function() {
-      alert("Please allow getting location, we won't be saving it but will be used to get nearby restaurants :(");
+      alert("If you are seeing this message, then you may have blocked getting location or the app might have failed to get your accurate location.");
     }, options);
   } else { 
     alert("Geolocation is not supported by this browser :( Try using a different browser or get the mobile app!");
@@ -276,6 +272,7 @@ function nextResto() {
   }
   var address = resultList[actualIndex].location.address2 === '' || resultList[actualIndex].location.address2 === null ? resultList[actualIndex].location.address1 : resultList[actualIndex].location.address1+', '+resultList[actualIndex].location.address2;
 
+  document.getElementById('resto-link').href = resultList[actualIndex].url;
   document.getElementById('resto-img').src = resultList[actualIndex].image_url;
   document.getElementById('resto-img2').src = resultList[actualIndex].image_url;
   document.getElementById('resto-name').innerHTML = resultList[actualIndex].name;
@@ -357,6 +354,7 @@ function retryRec() {
   $('#about-items').show();
   $('#card_form').show();
   $('#card_form2').show();
+  $('#card_form3').show();
   document.getElementById('right-panel').innerHTML = '';
   index = 0;
   Materialize.toast('Sign up to get better recommendations and access more features!', 8000, 'rounded');

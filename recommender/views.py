@@ -5,6 +5,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from rest_framework.views import APIView
+from allauth.socialaccount.models import SocialAccount
 from users.models import User, Group
 from ceat.settings import MY_URL, GOOGLE_API_KEY
 from .utils import query_api
@@ -35,7 +36,7 @@ class soloRecommendation(APIView):
         except:
             return HttpResponse(json.dumps({'error': 'Error! Invalid parameters!'}), content_type="application/json")
 
-        allRestaurants = [x for x in query_api(longitude, latitude, distance, price=price)['businesses']]
+        allRestaurants = query_api(longitude, latitude, distance, price=price)['businesses']
         user = User.objects.get(pk=uid)
         user_prefs = eval(user.preferences)
         user_dislikes = [x for x in user_prefs if user_prefs[x] == -1]
@@ -80,16 +81,17 @@ class groupRecommendation(APIView):
         Returns restaurant recommendation based on group's preferences and location
         """
         try:
-	        uid_list = set(eval(self.request.query_params.get('uid_list')))
-	        gid_list = list(eval(self.request.query_params.get('gid_list')))
-	        latitude = float(self.request.query_params.get('latitude'))
-	        longitude = float(self.request.query_params.get('longitude'))
-	        term = self.request.query_params.get('term')
+            uid_list = eval(self.request.query_params.get('uid_list'))
+            gid_list = eval(self.request.query_params.get('gid_list'))
+            distance = int(self.request.query_params.get('distance'))
+            latitude = float(self.request.query_params.get('latitude'))
+            longitude = float(self.request.query_params.get('longitude'))
+            term = self.request.query_params.get('term')
+            price = self.request.query_params.get('price')
         except:
         	return HttpResponse(json.dumps({'error': 'Error! Invalid parameters!'}), content_type="application/json")
 
-        allRestaurants = query_api(longitude, latitude)['businesses']
-        #allRestaurants = [x['name'] for x in query_api(longitude, latitude)['businesses']]
+        allRestaurants = query_api(longitude, latitude, distance, price=price)['businesses']
         for group in gid_list:
         	usersInGroup = Group.objects.get(pk=group).members.all()
         	for user in usersInGroup:
@@ -106,14 +108,8 @@ class groupRecommendation(APIView):
         			categoryDislikes.add(category)
 
         	categoryDislikeString = ','.join(categoryDislikes)
-        	print('Dislikes: {}'.format(categoryDislikeString))
-        	#dislikes = query_api(longitude, latitude, categories=categoryDislikeString)['businesses'] if categoryDislikeString else []
-        	dislikes = [x['name'] for x in query_api(longitude, latitude, categories=categoryDislikeString)['businesses']] if categoryDislikeString else []
-        	#likes = query_api(longitude, latitude, term)['businesses']
-        	likes = [x['name'] for x in query_api(longitude, latitude, term)['businesses']]
-        	print('Search term: {}'.format(term))
-        	dislikes = set(dislikes)
-        	dislikes = list(dislikes)
+        	dislikes = query_api(longitude, latitude, distance, categories=categoryDislikeString, price=price)['businesses'] if categoryDislikeString else []
+        	likes = query_api(longitude, latitude, distance, term, price=price)['businesses']
         	semilikes = [x for x in dislikes if x in likes]
         	for item in semilikes:
         		likes.remove(item)
@@ -154,12 +150,9 @@ class groupRecommendation(APIView):
         	likeString = ','.join(user_likes)
         	semilikeString = ','.join(user_semilikes)
         	dislikeString = ','.join(user_dislikes)
-        	#dislikes = [x['name'] for x in query_api(longitude, latitude, categories=dislikeString)['businesses']] if dislikeString else []
-        	dislikes = [x for x in query_api(longitude, latitude, categories=dislikeString)['businesses']] if dislikeString else []
-        	#semilikes = [x['name'] for x in query_api(longitude, latitude, categories=semilikeString)['businesses']] if semilikeString else []
-        	semilikes = [x for x in query_api(longitude, latitude, categories=semilikeString)['businesses']] if semilikeString else []
-        	#likes = [x['name'] for x in query_api(longitude, latitude, categories=likeString)['businesses']]
-        	likes = [x for x in query_api(longitude, latitude, categories=likeString)['businesses'] if x not in semilikes]
+        	dislikes = query_api(longitude, latitude, distance, categories=dislikeString, price=price)['businesses'] if dislikeString else []
+        	semilikes = query_api(longitude, latitude, distance, categories=semilikeString, price=price)['businesses'] if semilikeString else []
+        	likes = [x for x in query_api(longitude, latitude, distance, categories=likeString, price=price)['businesses'] if x not in semilikes]
 
         	tempList = []
         	for item in dislikes:
@@ -201,15 +194,46 @@ class trialRecommendation(APIView):
         except:
             return HttpResponse(json.dumps({'error': 'Error! Invalid parameters!'}), content_type="application/json")
 
-        allRestaurants = [x for x in query_api(longitude, latitude)['businesses']]
+        allRestaurants = query_api(longitude, latitude)['businesses']
         likes = query_api(longitude, latitude, term=term)['businesses']
         others = [x for x in allRestaurants if x not in likes]
         return HttpResponse(json.dumps({'likes': likes, 'others': others}), content_type="application/json")
 
         
 def home(request):
-    template = 'recommender/home_in.html' if request.user.is_authenticated else 'recommender/home.html'
+    template = 'recommender/home.html'
     context = {'googlekey': GOOGLE_API_KEY}
+
+    if request.user.is_authenticated:
+        template = 'recommender/home_in.html'
+        user_social = SocialAccount.objects.filter(user=request.user).count()
+        if user_social:
+            user_friends_temp = SocialAccount.objects.get(user=request.user).extra_data['friends']['data']
+            user_friends = []
+            for person in user_friends_temp:
+                if person['name'] in ('Andre Arbitrario'):
+                    continue
+                socialAcc = SocialAccount.objects.get(uid=person['id'])
+                person['picture'] = socialAcc.extra_data['picture']['data']['url']
+                person['id'] = socialAcc.user.id
+                user_friends.append(person)
+            context['friends'] = user_friends
+        user_created_groups = Group.objects.filter(creator=request.user)
+        if user_created_groups:
+            user_groups = []
+            for group in user_created_groups:
+                groupEntry = dict()
+                groupEntry['id'] = group.id
+                groupEntry['name'] = group.name
+                groupEntry['members'] = []
+                groupEntryMembers = group.members.all()
+                for member in groupEntryMembers:
+                    memberDetails = dict()
+                    memberDetails['id'] = member.id
+                    memberDetails['picture'] = member.avatar_url
+                    groupEntry['members'].append(memberDetails)
+                user_groups.append(groupEntry)
+            context['groups'] = user_groups
 
     return render(request, template, context)
 

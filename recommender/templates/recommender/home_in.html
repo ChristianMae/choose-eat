@@ -24,7 +24,7 @@
       <br />
       <a class="waves-effect waves-light btn-large black" style="width: 175px;" href="javascript:showSoloRec();"><i class="fa fa-user left"></i>Solo</a>
       <h3 class="otherfont shadowed">OR</h3>
-	  <a class="waves-effect waves-light btn-large black" style="width: 175px;" href="#"><i class="fa fa-group left"></i>Group</a>
+	  <a class="waves-effect waves-light btn-large black" style="width: 175px;" href="javascript:showGroupRec();"><i class="fa fa-group left"></i>Group</a>
       <br />
     </div>
   </div>
@@ -37,20 +37,20 @@
       <br />
       <a class="waves-effect waves-light btn-large black" style="width: 175px;" href="javascript:showSoloRec();"><i class="fa fa-user left"></i>Solo</a>
       <h3 class="otherfont shadowed">OR</h3>
-	  <a class="waves-effect waves-light btn-large black" style="width: 175px;" href="#"><i class="fa fa-group left"></i>Group</a>
+	  <a class="waves-effect waves-light btn-large black" style="width: 175px;" href="javascript:showGroupRec();"><i class="fa fa-group left"></i>Group</a>
       <br />
     </div>
   </div>
 </div>
 
-<div class="row hide-on-med-and-down otherfont" style="position:relative;top:-55rem;" id="select_card3">
+<div class="row hide-on-med-and-down otherfont" style="position:relative;top:-60rem;" id="select_card3">
   <div class="col l3"></div>
   <div class="col s12 l6">
     <div class="form-container center-align" style="padding-bottom: 20px;">
       <br />
       <a class="waves-effect waves-light btn-large black" style="width: 175px;" href="javascript:showSoloRec();"><i class="fa fa-user left"></i>Solo</a>
       <h3 class="otherfont shadowed">OR</h3>
-	  <a class="waves-effect waves-light btn-large black" style="width: 175px;" href="#"><i class="fa fa-group left"></i>Group</a>
+	  <a class="waves-effect waves-light btn-large black" style="width: 175px;" href="javascript:showGroupRec();"><i class="fa fa-group left"></i>Group</a>
       <br />
     </div>
   </div>
@@ -65,37 +65,13 @@
 
 <ul id='userMenu' class='dropdown-content' >
   <li><a href="#!" class="otherfont"><i class="fa fa-user-circle"></i>Profile</a></li>
-  <li><a href="#!" class="otherfont"><i class="fa fa-gears"></i>Settings</a></li>
+  <li><a href="{% url 'account_change_password' %}" class="otherfont"><i class="fa fa-gears"></i>Settings</a></li>
   <li class="divider"></li>
   <li><a href="{% url 'account_logout' %}" class="otherfont"><i class="fa fa-sign-out"></i>Logout</a></li>
 </ul>
 {% endblock %}
 
 {% block content %}
-<span class="white-text" id="locations"><b id="id_latitude"></b><b id="id_longitude"></b></span>
-<ul id="about-items">
-  <li style="opacity:0;"><h2 class="header otherfont">About</h2></li>
-  <li style="opacity:0;"><p class="black-text" style="max-width: 1000px; word-wrap: break-word;">
-    <i>dock</i> &emsp;|&emsp;/däk/&emsp;|&emsp;verb&emsp;|<br/> - to cut short <br/> - to take away a part of
-	<br />
-	<small>(From <a href="https://www.merriam-webster.com/dictionary/dock">Merriam-Webster's 3rd definition</a>)</small>
-	<br /><br />
-	<b><i>Dock</i> is basically yet another URL shortener, similar to <a href="https://bitly.com/">Bitly</a>.
-	<br /><br />
-	Turn a long URL like this:
-	<br />
-	https://www.youtube.com/watch?v=QslJYDX3o8s&amp;list=PLBDeA3o056yyMUiRG3xCXaSDan_bGG-Ho
-	<br /><br />
-	Into something like this:
-	<br />
-	http://dockr.herokuapp.com/a5dfmp
-	<br /><br />
-	This way, links are more manageable, easier to share, and kept secret. 
-	<br />
-	Dock is a school project, made with the use of <a href="https://www.djangoproject.com/">Django</a> and <a href="http://materializecss.com/">MaterializeCSS</a>.</b>
-  </p></li>
-</ul>
-
 <div class="row" id="header_text">
   <div class="col s12">
     <h3 id="hdr" class="otherfont center-align hide-on-med-and-up"></h3>
@@ -105,39 +81,89 @@
 </div>
 
 <div class="row" id="preSoloRec">
-  <div class="container">
-    <div class="col s12">
-      <h5 class="otherfont"><i class="fa fa-sliders left"></i>How far are you willing to go? (km)</h5>
-      <form action="#">
-        <p class="range-field">
-          <input type="range" id="id_distance" min="1" max="40" value="5" />
-          <small style="margin-bottom: 100px;">Higher search distance will most likely result to more results! (Default: 5 km)</small>
-        </p>
-      </form>
-      <h5 class="otherfont"><i class="fa fa-money left"></i>Price levels:</h5>
-      <div id="test-slider" style="margin-top: 25px;margin-bottom: 15px;"></div>
-      <p><small style="margin-bottom: 100px;">Setting a price range other than the default might cause exclusion of some restaurants or lesser results. (Default: 1-4)</small></p>
-    </div>
-    <div class="col s12 m5 l5 center-align">
-      <form id="keyword_rec">
-        {% csrf_token %}
-        <div class="row">
-          <div class="input-field col s12">
-              <input id="id_term" name="term" maxlength="24" type="text" placeholder="What are you looking to eat?" required autocomplete="off">
-              <small>Want to eat something specific? Could be some good 'chicken', or a delicious bowl of 'ramen' perhaps?</small> <br/>
-          </div>
+  <div class="col s12">
+    <h5 class="otherfont"><i class="fa fa-sliders left"></i>How far are you willing to go? (km)</h5>
+    <form action="#">
+      <p class="range-field">
+        <input type="range" id="id_distance" min="1" max="40" value="5" />
+        <small style="margin-bottom: 100px;">Higher search distance will most likely result to more results! (Default: 5 km)</small>
+      </p>
+    </form>
+    <h5 class="otherfont"><i class="fa fa-money left"></i>Price levels:</h5>
+    <div id="test-slider" style="margin-top: 25px;margin-bottom: 15px;"></div>
+    <p><small style="margin-bottom: 100px;">Setting a price range other than the default might cause exclusion of some restaurants or lesser results. (Default: 1-4)</small></p>
+  </div>
+  <div class="col s12 m5 l5 center-align">
+    <form id="keyword_rec">
+      {% csrf_token %}
+      <div class="row">
+        <div class="input-field col s12">
+            <input id="id_term" name="term" maxlength="24" type="text" placeholder="What are you looking to eat?" required autocomplete="off">
+            <small>Want to eat something specific? Could be some good 'chicken', or a delicious bowl of 'ramen' perhaps?</small> <br/>
         </div>
-        <button class="btn black waves-effect waves-light otherfont" type="submit" name="action">Submit</button>
-      </form>
+      </div>
+      <button class="btn black waves-effect waves-light otherfont" type="submit" name="action">Submit</button>
+    </form>
+  </div>
+  <div class="col s12 m2 l2">
+    <h3 class="otherfont center-align">OR</h3>
+  </div>
+  <div class="col s12 m5 l5 center-align">
+    <a id="nkey_rec" class="waves-effect waves-light btn-large black otherfont pulse" style="margin-top: 6px;"><i class="fa fa-cutlery left"></i>Dazzle Me!</a>
+    <br /><br />
+    <small>Not really looking for anything specific, but just want awesome food that'll match your taste? Leave it to us!</small> <br/>
+  </div>
+</div>
+
+<div class="row" id="preGroupRec">
+  <div class="col s12">
+    <h5 class="otherfont"><i class="fa fa-sliders left"></i>How far are you willing to go? (km)</h5>
+    <form action="#">
+      <p class="range-field">
+        <input type="range" id="id_distance2" min="1" max="40" value="5" />
+        <small style="margin-bottom: 100px;">Higher search distance will most likely result to more results! (Default: 5 km)</small>
+      </p>
+    </form>
+    <h5 class="otherfont"><i class="fa fa-money left"></i>Price levels:</h5>
+    <div id="test-slider2" style="margin-top: 25px;margin-bottom: 15px;"></div>
+    <p><small style="margin-bottom: 100px;">Setting a price range other than the default might cause exclusion of some restaurants or lesser results. (Default: 1-4)</small></p>
+    <div class="col s12 m6 l6">
+      <h5 class="otherfont"><i class="fa fa-group left"></i>Groups:</h5>
+      <select class="browser-default" multiple id="group-select" style="height:200px;">
+        {% for group in groups %}
+        <option value="{{ group.id }}">{{ group.name }}</option>
+        {% endfor %}
+      </select>
     </div>
-    <div class="col s12 m2 l2">
-      <h3 class="otherfont center-align">OR</h3>
+    <div class="col s12 m6 l6">
+      <h5 class="otherfont"><i class="fa fa-group left"></i>Friends:</h5>
+      <select class="browser-default" multiple id="friend-select" style="height:200px;">
+        {% for friend in friends %}
+        <option value="{{ friend.id }}">{{ friend.name }} <img src="{{ friend.picture }}"></option>
+        {% endfor %}
+      </select>
     </div>
-    <div class="col s12 m5 l5 center-align">
-      <a id="nkey_rec" class="waves-effect waves-light btn-large black otherfont pulse" style="margin-top: 6px;"><i class="fa fa-cutlery left"></i>Dazzle Me!</a>
-      <br /><br />
-      <small>Not really looking for anything specific, but just want awesome food that'll match your taste? Leave it to us!</small> <br/>
-    </div>
+    <p><small style="margin-bottom: 100px;">Who are you going out with? Hold the Ctrl key while clicking to select multiple groups/friends, or to deselect.</small></p>
+  </div>
+  <div class="col s12 m5 l5 center-align">
+    <form id="keyword_grec">
+      {% csrf_token %}
+      <div class="row">
+        <div class="input-field col s12">
+            <input id="id_term2" name="term" maxlength="24" type="text" placeholder="What are you looking to eat?" required autocomplete="off">
+            <small>Want to eat something specific? Could be some good 'chicken', or a delicious bowl of 'ramen' perhaps?</small> <br/>
+        </div>
+      </div>
+      <button class="btn black waves-effect waves-light otherfont" type="submit" name="action">Submit</button>
+    </form>
+  </div>
+  <div class="col s12 m2 l2">
+    <h3 class="otherfont center-align">OR</h3>
+  </div>
+  <div class="col s12 m5 l5 center-align">
+    <a id="nkey_grec" class="waves-effect waves-light btn-large black otherfont pulse" style="margin-top: 6px;"><i class="fa fa-cutlery left"></i>Dazzle Me!</a>
+    <br /><br />
+    <small>Not really looking for anything specific, but just want awesome food that'll match your taste? Leave it to us!</small> <br/>
   </div>
 </div>
 
@@ -210,12 +236,14 @@ var actualIndex = 0;
 var resultList, lat, lng;
 var subtext = document.getElementById('subtext');
 var slider = document.getElementById('test-slider'); 
+var slider2 = document.getElementById('test-slider2'); 
 
 $(document).ready(function() {
   getLocation();
   $('#locations').hide();
   $('#header_text').hide();
   $('#preSoloRec').hide();
+  $('#preGroupRec').hide();
   $('#loading').hide();
   $('#results').hide();
   $('#no-results').hide();
@@ -240,6 +268,20 @@ $(document).ready(function() {
      decimals: 0
    })
   });
+
+  noUiSlider.create(slider2, {
+   start: [1, 4],
+   connect: true,
+   step: 1,
+   orientation: 'horizontal',
+   range: {
+     'min': 1,
+     'max': 4
+   },
+   format: wNumb({
+     decimals: 0
+   })
+  });
 });
 
 $('#keyword_rec').on('submit', function(e) {
@@ -248,6 +290,14 @@ $('#keyword_rec').on('submit', function(e) {
 });
 $('#nkey_rec').on('click', function(e) {
   getSoloResults(e);
+});
+
+$('#keyword_grec').on('submit', function(e) {
+  e.preventDefault();
+  getGroupesults(e);
+});
+$('#nkey_grec').on('click', function(e) {
+  getGroupResults(e);
 });
 
 function showSoloRec() {
@@ -261,6 +311,23 @@ function showSoloRec() {
   document.getElementById('subtext').innerHTML = 'Alone but not lonely! <i class="fa fa-smile-o"></i>';
   $('#header_text').show();
   $('#preSoloRec').show();
+  
+  $('html, body').animate({
+      scrollTop: $("#about").offset().top-75
+  }, 1000);
+}
+
+function showGroupRec() {
+  $('#about-items').hide();
+  $('#select_card').hide();
+  $('#select_card2').hide();
+  $('#select_card3').hide();
+
+  document.getElementById('hdr').innerHTML = "Group Recommendation";
+  document.getElementById('hdr2').innerHTML = "Group Recommendation";
+  document.getElementById('subtext').innerHTML = "It's more fun with friends! <i class='fa fa-smile-o'></i>";
+  $('#header_text').show();
+  $('#preGroupRec').show();
   
   $('html, body').animate({
       scrollTop: $("#about").offset().top-75
@@ -292,7 +359,7 @@ function getSoloResults(event) {
   }
 
   if (event.target.id === 'keyword_rec') {
-    params.term = $('#id_term').val();
+    params.term = $('#id_term2').val();
     document.getElementById('id_term').value=null;
   }
 
@@ -334,6 +401,92 @@ function getSoloResults(event) {
   });
 }
 
+function getGroupResults(event) {
+  var selectedOpts = document.getElementById('friend-select').selectedOptions;
+  var selectedFriends = [];
+  for (var i = 0; i < selectedOpts.length; i++) {
+    selectedFriends.push(selectedOpts[i].value);
+  }
+  selectedFriends.push({{ user.id }});
+
+  var selectedOpts2 = document.getElementById('group-select').selectedOptions;
+  var selectedGroups = [];
+  for (var i = 0; i < selectedOpts2.length; i++) {
+    selectedGroups.push(selectedOpts2[i].value);
+  }
+  if (selectedFriends.length == 1 && selectedGroups.length == 0) {
+    alert("You have not selected any friends/groups!");
+  } else {
+    lat = document.getElementById('id_latitude').innerHTML;
+    lng = document.getElementById('id_longitude').innerHTML;
+
+    var params = {
+      latitude: lat,
+      longitude: lng,
+      uid_list: '{'+selectedFriends.join(', ')+'}',
+      gid_list: '{'+selectedGroups.join(', ')+'}',
+      distance: $('#id_distance2').val() * 1000
+    };
+
+    var priceRange = slider2.noUiSlider.get();
+    if (priceRange != '1,4') {
+      if (priceRange.length == 1) {
+        params.price = priceRange[0].toString();
+      } else {
+        var newRange = [];
+        for(var i = priceRange[0]; i <= priceRange[1]; i++) {
+          newRange.push(i);
+        }
+        params.price = newRange.join(', ');
+      } 
+    }
+
+    if (event.target.id === 'keyword_grec') {
+      params.term = $('#id_term2').val();
+      document.getElementById('id_term2').value=null;
+    }
+
+    console.log(params);
+
+    $.ajax({
+      type: 'GET',
+      url: '{% url 'groupRec' %}',
+      data: params,
+      beforeSend: function() {
+        $('#preGroupRec').hide();
+        $('#loading').show();
+        var x = document.getElementById('loadingtxt'), 
+        messages = ['Anytime now...', 'This is taking longer than expected...'],
+        i = 0;
+        setInterval(function () {
+          x.innerHTML = messages[i++];
+          i = messages.length === i ? 0 : i;
+        }, 5000);
+      },
+      complete: function(response) {
+        $('#loading').hide();
+      },
+      success: function(response) {
+        restoList = response;
+        console.log(restoList);
+        if (restoList.likes.length == 0 && restoList.semilikes.length == 0 && restoList.others.length == 0 && restoList.dislikes.length == 0) {
+          if (event.target.id === 'keyword_grec') {
+            document.getElementById('usedterm').innerHTML = params.term;
+          }
+          else {
+            document.getElementById('noRes_head').innerHTML = 'No results found!';
+            document.getElementById('noRes_newkey').innerHTML = '';
+          }
+          $('#no-results').show();
+        } else {
+          nextResto();
+          $('#results').show();
+        }
+      }
+    });
+  }
+}
+
 function getLocation() {
   var options = {
     enableHighAccuracy: true,
@@ -346,7 +499,7 @@ function getLocation() {
       document.getElementById("id_latitude").innerHTML = ''+ position.coords.latitude;
       document.getElementById("id_longitude").innerHTML = ''+ position.coords.longitude;
     }, function() {
-      alert("Please allow getting location, we won't be saving it but will be used to get nearby restaurants :(");
+      alert("If you are seeing this message, then you may have blocked getting location or the app might have failed to get your accurate location.");
     }, options);
   } else { 
     alert("Geolocation is not supported by this browser :( Try using a different browser or get the mobile app!");

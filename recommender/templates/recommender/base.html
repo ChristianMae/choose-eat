@@ -50,6 +50,32 @@
 
 	    <div class="section white" id="about">
 	      <div class="row container" id="panel_content">
+	        <span class="white-text" id="locations"><b id="id_latitude"></b><b id="id_longitude"></b></span>
+			<ul id="about-items" class="center-align">
+			  <li style="opacity:0;"><h2 class="header otherfont">About</h2></li>
+			  <li style="opacity:0;"><p style="max-width: 1000px; word-wrap: break-word;">
+			    <h5 class="otherfont">Choose-Eat provides restaurant recommendations that you will surely love!</h5>
+			  <li style="opacity:0;margin-top: 65px;">
+			  <div class="row">
+			    <div class="col s12 m4 l4">
+			      <i class="fa fa-heart fa-5x"></i><br>
+			      <h4 class="otherfont">Preference-based</h4>
+			      <p class="grey-text darken-4">Our recommendations take not only price levels and distance into consideration, but also a wide variety of food categories that you love so we can ensure that you'd be satisfied with the results.</p>
+			    </div>
+			   <div class="col s12 m4 l4">
+			      <i class="fa fa-group fa-5x"></i><br>
+			      <h4 class="otherfont">Social</h4>
+			      <p class="grey-text darken-4">Who doesn't love going out with friends? Well we all know how these times can be <i>plagued</i> with the question, "Where are we eating?". Fret not! Our recommendations are not limited to just individuals, but available for groups too!</p>
+			    </div>
+			    <div class="col s12 m4 l4">
+			      <i class="fa fa-map-marker fa-5x"></i><br>
+			      <h4 class="otherfont">Location-based</h4>
+			      <p class="grey-text darken-4">We make sure our recommendations are near you, and match the distance you are willing to travel. The app is also helpful when traveling to other places because we provide directions to the establishments we recommend.</p>
+			    </div>
+			  </div>
+			  </li>
+			  <li style="opacity:0;margin-bottom: -50px;"><h5 class="otherfont">You can read more about Choose-Eat <a href="#">here</a>!</h5></li>
+			</ul>
 	        {% block content %}
 	        {% endblock %}
 	      </div>
@@ -71,21 +97,22 @@
     </main>
 
     <footer class="page-footer grey darken-4" id="connect">
-      <div class="container">
+      <div class="container otherfont shadowed">
         <div class="row">
-          <div class="col s12 l4" style="overflow: hidden;">
-            <h5 class="white-text">Yeah</h5> 
-            <p class="white-text">Yeah</p>
+          <div class="col s12 l8" style="overflow: hidden;">
+            <h5 class="white-text"><i class="fa fa-code left"></i>Developers' Notes</h5> 
+            <p class="white-text">Restaurant data, including preview images and location, are retrieved from <a href="https://www.yelp.com/developers/documentation/v3/" class="white-text"><i class="fa fa-yelp red-text"></i> Yelp</a>. If there are missing estrablishments, please submit them <a href="https://biz.yelp.com/signup_business/new?utm_content=add_business_as_owner&utm_medium=www&utm_source=search_page&utm_campaign=add_business">here.</a> Also, please allow getting location, as this will be used to retrieve nearby restaurants, and won't be used for any other purpose.</p>
           </div>
 
           <div class="col s12 l4" style="overflow: hidden;">
-            <h5 class="white-text">Yeah2</h5> 
-            <p class="white-text">Yeah2</p>
-          </div>
-
-          <div class="col s12 l4" style="overflow: hidden;">
-            <h5 class="white-text">Yeah3</h5> 
-            <p class="white-text">Yeah3</p>
+            <h5 class="white-text"><i class="fa fa-graduation-cap left"></i>Capstone Project</h5> 
+            <p class="white-text">
+              <ul>
+                <li>Sam B. Benemerito</li>
+                <li>Isaiah Ganiel L. Bontia</li>
+                <li>Rayvince Clark U. Parages</li>
+              </ul>
+            </p>
           </div>
         </div>
       </div>
