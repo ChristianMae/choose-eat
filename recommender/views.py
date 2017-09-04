@@ -44,7 +44,7 @@ class soloRecommendation(APIView):
         dislikes = query_api(longitude, latitude, distance, categories=categoryDislikeString, price=price)['businesses'] if categoryDislikeString else []
         if term:
         	# Give recommendations using keyword
-        	likes = query_api(longitude, latitude, distance, term, price=price)['businesses']
+            likes = query_api(longitude, latitude, distance, term, price=price)['businesses']
         else:
         	# Give recommendations based on user preferences
             user_likes = [x for x in user_prefs if user_prefs[x] == 1]

@@ -1,14 +1,41 @@
 {% extends 'users/base_other.html' %}
 {% load static %}
+{% load i18n %}
 
-{% block title %}Choose-Eat | Preferences{% endblock title %}
+{% block title %}Choose-Eat | Settings{% endblock title %}
 
-{% block header %}Edit Preferences{% endblock header %}
-{% block header_small %}Edit Preferences{% endblock header_small %}
+{% block header %}<img class="circle z-depth-5 hoverable responsive-img" src="{% if user.avatar_url %}{{ user.avatar_url }}{% else %}{% static  'recommender/default_avatar.jpg' %}{% endif %}" style="width:150px;height:150px;"></i><br>{% if user.get_full_name %}{{ user.get_full_name }}{% else %}{{ user.username }}{% endif %}{% endblock header %}
+{% block header_small %}<img class="circle z-depth-5 hoverable responsive-img" src="{% if user.avatar_url %}{{ user.avatar_url }}{% else %}{% static  'recommender/default_avatar.jpg' %}{% endif %}" style="width:200px;height:200px;"></i><br>{% if user.get_full_name %}{{ user.get_full_name }}{% else %}{{ user.username }}{% endif %}{% endblock header_small %}
 
-{% block subtext %}<a class="btn black" id="id_save" href="#" onclick="savePreferences();return false;">Save</a>{% endblock subtext %}
+{% block subtext %}
+<h6 class="center-align otherfont">{{ user.bio }}</h6>
+<br><hr>
+<div class="row otherfont hide-on-large-only">
+  <div class="col s12">
+    <ul class="tabs">
+      <li class="tab col s4"><a class="black-text" href="{% url 'users:account_profile' %}"><i class="fa fa-history"></i></a></li>
+      <li class="tab col s4"><a class="black-text" target="_self" href="{% url 'account_email' %}"><i class="fa fa-group"></i></a></li>
+      <li class="tab col s4 disabled"><a class="black-text active" target="_self"><i class="fa fa-heart"></i></a></li>
+    </ul>
+  </div>
+</div>
+
+<div class="row otherfont hide-on-med-and-down">
+  <div class="col s12">
+    <ul class="tabs">
+      <li class="tab col s4"><a class="black-text" target="#myContent" href="{% url 'users:account_profile' %}"><i class="fa fa-history left" style="margin-top:17px;margin-left:35px;margin-right:-30px;"></i>History</a></li>
+      <li class="tab col s4"><a class="black-text" target="_self" href="{% url 'account_email' %}"><i class="fa fa-group left" style="margin-top:17px;margin-left:35px;margin-right:-30px;"></i>Friends &amp; Groups</a></li>
+      <li class="tab col s4 disabled"><a class="black-text active" target="_self"><i class="fa fa-heart left" style="margin-top:17px;margin-left:35px;margin-right:-30px;"></i>Food Preferences</a></li>
+    </ul>
+  </div>
+</div>
+{% endblock subtext %}
 
 {% block content %}
+<div class="row center-align otherfont">
+  <a class="btn black" id="id_save" href="#" onclick="savePreferences();return false;"><i class="fa fa-save"></i> Save</a>
+</div>
+
 <div class="row" id="pref_selection">
   {% for name, code in categories.items %} 
   <div class="col s6 m3 l3">
@@ -40,24 +67,6 @@
     {% csrf_token %}
   </form>
 </div>
-
-<div class="row" id="loading">
-  <div class="col s12 center">
-    <br /><br />
-    <div class="preloader-wrapper big active">
-      <div class="spinner-layer spinner center-align">
-        <div class="circle-clipper left">
-          <div class="circle"></div>
-        </div><div class="gap-patch">
-          <div class="circle"></div>
-        </div><div class="circle-clipper right">
-          <div class="circle"></div>
-        </div>
-      </div>
-    </div>
-    <h5 class="otherfont" id="loadingtxt">Setting things up...</h4>
-  </div>
-</div>
 {% endblock content %}
 
 {% block javascript %}
@@ -65,7 +74,6 @@
 var ratings = {};
 
 $(document).ready(function(){
-  $('#loading').hide();
   {% if messages %}
     {% for message in messages %}
     Materialize.toast('{{ message }}', 3000, 'rounded');
@@ -118,25 +126,8 @@ function savePreferences() {
     type: 'POST',
     url: '{% url 'setPrefs' %}',
     data: params,
-    beforeSend: function() {
-      $('#pref_selection').hide();
-      $('#subtext').hide();
-      $('#loading').show();
-      var x = document.getElementById('loadingtxt'), 
-      messages = ['Almost there...', 'This is taking longer than expected...'],
-      i = 0;
-      setInterval(function () {
-        x.innerHTML = messages[i++];
-        i = messages.length === i ? 0 : i;
-      }, 5000);
-    },
-    complete: function(response) {
-      $('#loading').hide();
-    },
     success: function(response) {
-      /*setTimeout(function() { 
-        window.location.replace("http://127.0.0.1:8000"); 
-      }, 3000);*/
+      Materialize.toast('Preferences updated', 3000, 'rounded');
     }
   });
 }

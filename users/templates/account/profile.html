@@ -9,12 +9,13 @@
 
 {% block subtext %}
 <h6 class="center-align otherfont">{{ user.bio }}</h6>
+<br><hr>
 <div class="row otherfont hide-on-large-only">
   <div class="col s12">
     <ul class="tabs">
-      <li class="tab col s4 disabled"><a class="black-text active"><i class="fa fa-unlock-alt"></i></a></li>
-      <li class="tab col s4"><a class="black-text" target="_self" href="{% url 'account_email' %}"><i class="fa fa-address-book"></i></a></li>
-      <li class="tab col s4"><a class="black-text" target="_self" href="{% url 'socialaccount_connections' %}"><i class="fa fa-users"></i></a></li>
+      <li class="tab col s4"><a class="black-text" href="#historytab"><i class="fa fa-history"></i></a></li>
+      <li class="tab col s4"><a class="black-text" href="#peerstab"><i class="fa fa-group"></i></a></li>
+      <li class="tab col s4"><a class="black-text" href="#preferencetab"><i class="fa fa-heart"></i></a></li>
     </ul>
   </div>
 </div>
@@ -22,22 +23,183 @@
 <div class="row otherfont hide-on-med-and-down">
   <div class="col s12">
     <ul class="tabs">
-      <li class="tab col s4 disabled"><a class="black-text active"><i class="fa fa-history left" style="margin-top:17px;margin-left:35px;margin-right:-30px;"></i>History</a></li>
-      <li class="tab col s4"><a class="black-text" target="_self" href="{% url 'account_email' %}"><i class="fa fa-group left" style="margin-top:17px;margin-left:35px;margin-right:-30px;"></i>Friends &amp; Groups</a></li>
-      <li class="tab col s4"><a class="black-text" target="_self" href="{% url 'socialaccount_connections' %}"><i class="fa fa-heart left" style="margin-top:17px;margin-left:35px;margin-right:-30px;"></i>Food Preferences</a></li>
+      <li class="tab col s4"><a class="black-text" href="#historytab"><i class="fa fa-history left" style="margin-top:17px;margin-left:35px;margin-right:-30px;"></i>Visit History</a></li>
+      <li class="tab col s4"><a class="black-text" href="#peerstab"><i class="fa fa-group left" style="margin-top:17px;margin-left:35px;margin-right:-30px;"></i>Friends &amp; Groups</a></li>
+      <li class="tab col s4"><a class="black-text" href="#preferencetab"><i class="fa fa-heart left" style="margin-top:17px;margin-left:35px;margin-right:-30px;"></i>Food Preferences</a></li>
     </ul>
   </div>
 </div>
 {% endblock subtext %}
 
 {% block content %}
-<h5 class="otherfont"><i class="fa fa-history"></i> History</h5>
+<div id="historytab">
+  <h4 class="otherfont center-align"><i class="fa fa-history fa-2x"></i><br>Visit History</h4>
+  <h5 class="otherfont">Unrated Visits:</h5>
+  <small>Rate according to your experience</small>
+  <div class="row" style="margin-top:25px;">
+    {% if not histories %}
+    <br><br><h5 class="otherfont center-align"><i class="fa fa-smile-o fa-2x"></i><br>No recent visits left unrated</h5><br>
+    {% else %}
+    {% for history in histories %}
+      <div class="col s6 m6 l6">
+        <div class="card blue-grey darken-1">
+          <div class="card-content white-text otherfont">
+            <span class="card-title">{{ history.resto|safe }}</span>
+            <p>Went: {{ history.date_went }}</p>
+            <br>
+          </div>
+          <div id="id_btns_{{ history.id }}">
+            <a class="btn-floating halfway-fab waves-effect waves-light green center" id="{{ history.id }}_2" href="#" onclick="storeHistory(this.id);return false;"><i class="fa fa-thumbs-up"></i></a>
+            <a class="btn-floating halfway-fab waves-effect waves-light red left" id="{{ history.id }}_1" href="#" onclick="storeHistory(this.id);return false;"><i class="fa fa-thumbs-down"></i></a>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+    {% endif %}
+  </div>
+  {% if histories %}
+  <div class="row center-align otherfont">
+    <a class="btn black" id="id_save" href="#" onclick="saveHistory();return false;"><i class="fa fa-save"></i> Save</a>
+  </div>
+  {% endif %}
+  <hr>
+  <h5 class="otherfont">Rated Visits:</h5>
+  <div class="row">
+    {% if not ratedHistories %}
+    <br><br><h5 class="otherfont center-align"><i class="fa fa-frown-o fa-2x"></i><br>You have not yet rated<br>your recent visits.</h5><p class="center-align otherfont">That is, if there were any...</p><br>
+    {% else %}
+    {% for history in ratedHistories %}
+      <div class="col s6 m6 l6">
+        <div class="card blue-grey darken-1">
+          <div class="card-content white-text otherfont">
+            <span class="card-title">{{ history.resto|safe }}</span>
+            <p>Went: {{ history.date_went }}</p>
+            <br>
+          </div>
+          <div id="id_btns_{{ history.id }}">
+            {% if history.isLiked %}
+            <a class="btn-floating halfway-fab waves-effect waves-light blue center" id="{{ history.id }}_2"><i class="fa fa-thumbs-up"></i></a>
+            {% else %}
+            <a class="btn-floating halfway-fab waves-effect waves-light blue center" id="{{ history.id }}_1"><i class="fa fa-thumbs-down"></i></a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+    {% endif %}
+  </div>
+</div>
+
+<div id="peerstab">
+  <h4 class="otherfont center-align"><i class="fa fa-group fa-2x"></i><br>Friends &amp; Groups</h4>
+  {% if not friends %}
+  <br><br><h5 class="otherfont center-align"><i class="fa fa-frown-o fa-2x"></i><br>Sorry, but you do not have friends yet!<br>Already connected your Facebook account?<br>(Settings > Social Accounts)<br></h5><p class="center-align otherfont">Welp, if you already have, then invite friends to use the app!</p><br>
+  {% else %}
+  <h5 class="otherfont">Friends:</h5>
+  <div class="row">
+    {% for friend in friends %}
+    <div class="col s6 m6 l4 center-align">
+      <img class="circle shadowed center-align" src="{{ friend.picture }}"><br><span class="otherfont">{{ friend.name }}</p>
+    </div>
+    {% endfor %}
+  </div>
+  <hr>
+  <h5 class="otherfont">Groups:</h5>
+  <div class="row">
+    <div class="col s12">
+      {% if not groups %}
+        <h5 class="otherfont center-align"><i class="fa fa-meh-o fa-2x"></i><br>Whoops, looks like you<br>have not created groups yet.</h5><br>
+      {% else %}
+      <ul class="collapsible" data-collapsible="accordion">
+        {% for group in groups %}
+        <li>
+          <div class="collapsible-header"><i class="fa fa-group left"></i>{{ group.name }}</div>
+          <div class="collapsible-body"><span>
+            <ul>
+              {% for member in group.members %}
+              <li>{{ member.name }}</li>
+              {% endfor %}
+          </span></div>
+        </li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </div>
+    <hr>
+    <div class="row">
+      <div class="col s12 l6">
+        <h4 class="otherfont">Create New Group:</h4>
+        <small>Do you frequently go out with the same group of people? Why not create a group? <i class="fa fa-smile-o"></i></small><br><br>
+        <form id="newGroupForm">
+          <p class="otherfont">Group Name:</p>
+          <input type="text" name="groupName" required="" id="id_groupname" max_length="24">
+          <p class="otherfont">Members:</p>
+          <small>Hold the Ctrl button while clicking to select multiple people, or to deselect one.</small><br><br>
+          <select class="browser-default" multiple id="member-select" style="height:200px;" required="" name="members">
+            {% for friend in friends %}
+            <option value="{{ friend.id }}">{{ friend.name }}</option>
+            {% endfor %}
+          </select>
+          <br>
+          <button class="btn black waves-effect waves-light otherfont" type="submit" name="action">Submit</button>
+        </form>
+      </div>
+      <div class="col l6 hide-on-med-and-down">
+        <img src="{% static 'recommender/group.jpg' %}" style="margin-left:50px;margin-top:75px;height:90%;width:90%;">
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<div id="preferencetab">
+  <div class="row center-align otherfont">
+    <h4 class="otherfont"><i class="fa fa-heart fa-2x"></i><br>Food Preferences</h4>
+    <a class="btn black" id="id_save" href="#" onclick="savePreferences();return false;"><i class="fa fa-save"></i> Save</a>
+  </div>
+
+  <div class="row" id="pref_selection">
+    {% for name, code in categories.items %} 
+    <div class="col s6 m3 l3">
+      <div class="card">
+        <div class="card-image">
+          <img src="{% with 'recommender/pref-imgs/'|add:code|add:'.jpg' as image_static %}{% static image_static %}{% endwith %}">
+          <p class="card-title shadowed hide-on-med-and-down">{{ name }}</p>
+          <p class="white-text shadowed hide-on-large-only" style="position:absolute;bottom:30px;left:20px;">{{ name }}</p>
+          <div id="id_btns_{{ code }}">
+            {% for pcode, pval in preferences.items %}
+              {% if code == pcode %}
+                {% if pval == 0 %}
+                <a class="btn-floating halfway-fab waves-effect waves-light green center" id="{{ code }}2" href="#" onclick="storePreference(this.id);return false;"><i class="fa fa-check"></i></a>
+                <a class="btn-floating halfway-fab waves-effect waves-light red left" id="{{ code }}1" href="#" onclick="storePreference(this.id);return false;"><i class="fa fa-remove"></i></a>
+                {% elif pval == 1 %}
+                <a class="btn-floating halfway-fab waves-effect waves-light blue right" id="{{ code }}3" href="#" onclick="storePreference(this.id);return false;"><i class="fa fa-check"></i></a>
+                {% elif pval == -1 %}
+                <a class="btn-floating halfway-fab waves-effect waves-light blue left" id="{{ code }}3" href="#" onclick="storePreference(this.id);return false;"><i class="fa fa-remove"></i></a>
+                {% endif %}
+              {% else %}
+              {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+    <form>
+      {% csrf_token %}
+    </form>
+  </div>
+</div>
 {% endblock %}
 
 
 {% block javascript %}
 <script>
+var ratings = {};
+var historyRatings = {};
+
 $(document).ready(function(){
+  $('.collapsible').collapsible();
   {% if messages %}
     {% for message in messages %}
     Materialize.toast('{{ message }}', 3000, 'rounded');
@@ -57,5 +219,106 @@ $('.dropdown-button').dropdown({
     stopPropagation: false // Stops event propagation
   }
 );
+
+$('#newGroupForm').on('submit', function(e) {
+  e.preventDefault();
+
+  var selectedMembers = document.getElementById('member-select').selectedOptions;
+  var groupMembers = [];
+  for (var i = 0; i < selectedMembers.length; i++) {
+    groupMembers.push(selectedMembers[i].value);
+  }
+  var params = {
+    uid: {{ user.id }},
+    name: $('#id_groupname').val(),
+    members: '['+groupMembers.join(', ')+']',
+    csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken').val()
+  }
+
+  $.ajax({
+    type: 'POST',
+    url: '{% url 'addGroup' %}',
+    data: params,
+    success: function(response) {
+      Materialize.toast('Group created (refresh page)', 3000, 'rounded');
+    }
+  });
+});
+
+function storePreference(buttonId) {
+  var id = String(buttonId);
+  var cat = id.substring(0, id.length-1);
+  var val = parseInt(id.charAt(id.length-1));
+
+  switch(val) {
+    case 1:
+      ratings[cat] = -1;
+      document.getElementById('id_btns_' +cat).innerHTML = '<a class="btn-floating halfway-fab waves-effect waves-light blue left" id="' +cat+ '3" href="#" onclick="storePreference(this.id);return false;"><i class="fa fa-remove"></i></a>';
+      break;
+    case 2:
+      ratings[cat] = 1;
+      document.getElementById('id_btns_' +cat).innerHTML = '<a class="btn-floating halfway-fab waves-effect waves-light blue right" id="' +cat+ '3" href="#" onclick="storePreference(this.id);return false;"><i class="fa fa-check"></i></a>';
+      break;
+    case 3:
+      ratings[cat] = 0;
+      document.getElementById('id_btns_' +cat).innerHTML = '<a class="btn-floating halfway-fab waves-effect waves-light green center" id="' +cat+ '2" href="#" onclick="storePreference(this.id);return false;"><i class="fa fa-check"></i></a><a class="btn-floating halfway-fab waves-effect waves-light red left" id="' +cat+ '1" href="#" onclick="storePreference(this.id);return false;"><i class="fa fa-remove"></i></a>'
+      break;
+  }
+}
+  
+function savePreferences() {
+  var params = {
+    uid: {{ user.id }},
+    ratings: JSON.stringify(ratings),
+    csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken').val()
+  };
+  
+  $.ajax({
+    type: 'POST',
+    url: '{% url 'setPrefs' %}',
+    data: params,
+    success: function(response) {
+      Materialize.toast('Preferences updated', 3000, 'rounded');
+    }
+  });
+}
+
+function storeHistory(buttonId) {
+  var id = String(buttonId);
+  var histId = id.substring(0, id.length-2);
+  var val = parseInt(id.charAt(id.length-1));
+
+  switch(val) {
+    case 1:
+      historyRatings[histId] = -1;
+      document.getElementById('id_btns_' +histId).innerHTML = '<a class="btn-floating halfway-fab waves-effect waves-light blue left" id="' +histId+ '_3" href="#" onclick="storeHistory(this.id);return false;"><i class="fa fa-thumbs-down"></i></a>';
+      break;
+    case 2:
+      historyRatings[histId] = 1;
+      document.getElementById('id_btns_' +histId).innerHTML = '<a class="btn-floating halfway-fab waves-effect waves-light blue right" id="' +histId+ '_3" href="#" onclick="storeHistory(this.id);return false;"><i class="fa fa-thumbs-up"></i></a>';
+      break;
+    case 3:
+      delete historyRatings[histId];
+      document.getElementById('id_btns_' +histId).innerHTML = '<a class="btn-floating halfway-fab waves-effect waves-light green center" id="' +histId+ '_2" href="#" onclick="storeHistory(this.id);return false;"><i class="fa fa-thumbs-up"></i></a><a class="btn-floating halfway-fab waves-effect waves-light red left" id="' +histId+ '_1" href="#" onclick="storeHistory(this.id);return false;"><i class="fa fa-thumbs-down"></i></a>'
+      break;
+  }
+}
+  
+function saveHistory() {
+  var params = {
+    uid: {{ user.id }},
+    ratings: JSON.stringify(historyRatings),
+    csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken').val()
+  };
+  
+  $.ajax({
+    type: 'POST',
+    url: '{% url 'setHistory' %}',
+    data: params,
+    success: function(response) {
+      Materialize.toast('History updated (Refresh the page)', 3000, 'rounded');
+    }
+  });
+}
 </script>
 {% endblock %}

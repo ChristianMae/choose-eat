@@ -223,7 +223,8 @@
     <div id="right-panel" class="col s12 m6 l6" style="height:500px;"></div>
   </div>
   <div class="row center-align">
-    <a class="waves-effect waves-light btn-large green otherfont" href="javascript:Materialize.toast('Bon appétit! Share your experience later! (Profile > History)', 5000, 'rounded');retryRec();"><i class="fa fa-thumbs-up left"></i>I'm here</a>
+    <form>{% csrf_token %}</form>
+    <a class="waves-effect waves-light btn-large green otherfont" href="javascript:finishRecommendation();"><i class="fa fa-thumbs-up left"></i>I'm here</a>
   </div>
 </div>
 {% endblock content %}
@@ -236,7 +237,11 @@ var actualIndex = 0;
 var resultList, lat, lng;
 var subtext = document.getElementById('subtext');
 var slider = document.getElementById('test-slider'); 
-var slider2 = document.getElementById('test-slider2'); 
+var slider2 = document.getElementById('test-slider2');
+var acceptData = {
+  uid: {{ user.id }},
+  categories: '['
+}; 
 
 $(document).ready(function() {
   getLocation();
@@ -359,7 +364,7 @@ function getSoloResults(event) {
   }
 
   if (event.target.id === 'keyword_rec') {
-    params.term = $('#id_term2').val();
+    params.term = $('#id_term').val();
     document.getElementById('id_term').value=null;
   }
 
@@ -531,9 +536,13 @@ function nextResto() {
   }
 
   var categories = [];
+  var categoriesCodes = [];
   for (var i = 0; i < resultList[actualIndex].categories.length; i++) {
+    acceptData.categories += "'"+resultList[actualIndex].categories[i].alias+"',";
     categories.push(resultList[actualIndex].categories[i].title);
+    categoriesCodes.push(resultList[actualIndex].categories[i].alias);
   }
+
   var address = resultList[actualIndex].location.address2 === '' || resultList[actualIndex].location.address2 === null ? resultList[actualIndex].location.address1 : resultList[actualIndex].location.address1+', '+resultList[actualIndex].location.address2;
 
   document.getElementById('resto-link').href = resultList[actualIndex].url;
@@ -557,12 +566,31 @@ function previousResto() {
 }
 
 function acceptResto() {
+  acceptData.resto = String(document.getElementById('resto-name').innerHTML);
+  var catsRemovedComma = acceptData.categories.substring(0, acceptData.categories.length-1)+']';
+  acceptData.categories = catsRemovedComma;
+
   document.getElementById('hdr').innerHTML = resultList[actualIndex].name;
   document.getElementById('hdr2').innerHTML = resultList[actualIndex].name;
   document.getElementById('subtext').innerHTML = "Mode of Travel:<br/><div class='col m4 l4'></div><select id='mode' class='browser-default col s12 m4 l4'><option value='DRIVING'>Driving</option><option value='WALKING'>Walking</option><option value='TRANSIT'>Transit</option></select>";
   initMap();
   $('#results').hide();
   $('#accepted').show();
+}
+
+function finishRecommendation() {
+  acceptData.csrfmiddlewaretoken = $('input[name=csrfmiddlewaretoken').val();
+
+  $.ajax({
+    type: 'POST',
+    url: '{% url 'addHistory' %}',
+    data: acceptData,
+    success: function(response) {
+      console.log(response);
+      Materialize.toast('Bon appétit! Share your experience later! (Profile > History)', 5000, 'rounded');
+      retryRec();
+    }
+  });
 }
 
 function initMap() {

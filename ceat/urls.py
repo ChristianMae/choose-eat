@@ -19,7 +19,7 @@ from django.contrib import admin
 from rest_framework import routers, serializers, viewsets
 from rest_framework_swagger.views import get_swagger_view
 from recommender.views import soloRecommendation, groupRecommendation, trialRecommendation
-from users.views import setPreferences, login, registration
+from users.views import setPreferences, login, registration, addHistory, setHistory, addGroup
 from users.models import User, Group
 
 
@@ -60,6 +60,9 @@ urlpatterns = [
     url(r'^api/groupRecommendation', groupRecommendation.as_view(), name="groupRec"),
     url(r'^api/trialRecommendation', trialRecommendation.as_view(), name="trialRec"),
     url(r'^api/setPreferences', setPreferences.as_view(), name="setPrefs"),
+    url(r'^api/setHistory', setHistory.as_view(), name="setHistory"),
+    url(r'^api/addHistory', addHistory.as_view(), name="addHistory"),
+    url(r'^api/addGroup', addGroup.as_view(), name="addGroup"),
     url(r'^api/login', login.as_view()),
     url(r'^api/registration', registration.as_view()),
     url(r'', include('recommender.urls', namespace='recommender')),

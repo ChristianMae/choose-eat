@@ -2,6 +2,7 @@ import json
 from django.shortcuts import render, redirect
 from django.dispatch import receiver
 from django.core import serializers
+from django.contrib import messages
 from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 from allauth.account.signals import user_signed_up
@@ -9,7 +10,7 @@ from allauth.socialaccount.signals import social_account_added, social_account_r
 from allauth.socialaccount.models import SocialAccount
 from rest_framework.views import APIView
 from ceat.settings import CATEGORY_DICT, MY_URL
-from .models import User
+from .models import User, History, Group
 
 
 @receiver(user_signed_up)
@@ -127,7 +128,6 @@ class setPreferences(APIView):
             uid = int(self.request.data.get('uid'))
             ratings = json.loads(self.request.data.get('ratings'))
         except Exception as ex:
-            print(ex)
             return HttpResponse(json.dumps({'error': 'Error! Invalid parameters!'}), content_type="application/json")
 
         user = User.objects.get(pk=uid)
@@ -137,6 +137,90 @@ class setPreferences(APIView):
         user.preferences = json.dumps(user_prefs)
         user.save()
         return HttpResponse(json.dumps({'uid': uid, 'ratings': ratings}), content_type="application/json")
+
+
+class addGroup(APIView):
+    """
+    Add Group Endpoint
+    """
+    def post(self, request, format=None):
+        """
+        Creates new group, then returns the details
+        """
+        try:
+            uid = int(self.request.data.get('uid'))
+            members = eval(self.request.data.get('members'))
+            name = self.request.data.get('name')
+        except Exception as ex:
+            return HttpResponse(json.dumps({'error': 'Error! Invalid parameters!'}), content_type="application/json")
+
+        user = User.objects.get(pk=uid)
+        groupMembers = User.objects.filter(pk__in=members)
+        newGroup = Group.objects.create(creator=user, name=name)
+        newGroup.members = groupMembers
+        newGroup.save()
+        return HttpResponse(json.dumps({'uid': uid, 'name': name, 'members': members}), content_type="application/json")
+
+
+class setHistory(APIView):
+    """
+    Set History Endpoint
+    """
+    def post(self, request, format=None):
+        """
+        Rates user history, then returns the changes
+        """
+        try:
+            uid = int(self.request.data.get('uid'))
+            ratings = json.loads(self.request.data.get('ratings'))
+        except Exception as ex:
+            return HttpResponse(json.dumps({'error': 'Error! Invalid parameters!'}), content_type="application/json")
+
+        user = User.objects.get(pk=uid)
+        user_prefs = eval(user.preferences)
+        historyIds = []
+        for history in ratings:
+            historyIds.append(int(history))
+        ratedHistories = History.objects.filter(pk__in=historyIds)
+        for history in ratedHistories:
+            restoCats = eval(history.categories)
+            if ratings[str(history.id)] == 1:
+                history.isLiked = True
+                for category in restoCats:
+                    user_prefs[category] = 1
+            else:
+                history.isLiked = False
+                for category in restoCats:
+                    user_prefs[category] = -1
+
+            history.save()
+        user.preferences = json.dumps(user_prefs)
+        user.save()
+        return HttpResponse(json.dumps({'uid': uid, 'ratings': ratings}), content_type="application/json")
+
+
+class addHistory(APIView):
+    """
+    Add History Endpoint
+    """
+    def post(self, request, format=None):
+        """
+        Adds to user history, then returns the changes
+        """
+        try:
+            resto = self.request.data.get('resto')
+            uid = int(self.request.data.get('uid'))
+            categories = self.request.data.get('categories')
+        except Exception as ex:
+            print(ex)
+            return HttpResponse(json.dumps({'error': 'Error! Invalid parameters!'}), content_type="application/json")
+
+        user = User.objects.get(pk=uid)
+        newHistory = History.objects.create(user=user, resto=resto, categories=categories)
+        newHistory.save()
+        newHistory = History.objects.last()
+
+        return HttpResponse(json.dumps({'user': newHistory.user.id, 'resto': newHistory.resto}), content_type="application/json")
 
 
 def startPrefs(request):
@@ -159,6 +243,41 @@ def settings_prefs(request):
 
 
 def account_profile(request):
-    if request.user.is_authenticated:
-        return render(request, template_name='account/profile.html', context={})
+    if request.user.is_authenticated:            
+        user_prefs = eval(request.user.preferences)
+        userHistory = History.objects.filter(user=request.user, isLiked__isnull=True)
+        userHistoryRated = History.objects.filter(user=request.user, isLiked__isnull=False)
+
+        context = {'categories': CATEGORY_DICT, 'preferences': user_prefs, 'histories': userHistory, 'ratedHistories': userHistoryRated}
+
+        user_social = SocialAccount.objects.filter(user=request.user).count()
+        if user_social:
+            user_friends_temp = SocialAccount.objects.get(user=request.user).extra_data['friends']['data']
+            user_friends = []
+            for person in user_friends_temp:
+                if person['name'] in ('Andre Arbitrario'):
+                    continue
+                socialAcc = SocialAccount.objects.get(uid=person['id'])
+                person['picture'] = socialAcc.extra_data['picture']['data']['url']
+                person['id'] = socialAcc.user.id
+                user_friends.append(person)
+            context['friends'] = user_friends
+        user_created_groups = Group.objects.filter(creator=request.user)
+        if user_created_groups:
+            user_groups = []
+            for group in user_created_groups:
+                groupEntry = dict()
+                groupEntry['id'] = group.id
+                groupEntry['name'] = group.name
+                groupEntry['members'] = []
+                groupEntryMembers = group.members.all()
+                for member in groupEntryMembers:
+                    memberDetails = dict()
+                    memberDetails['id'] = member.id
+                    memberDetails['name'] = member.get_full_name()
+                    groupEntry['members'].append(memberDetails)
+                user_groups.append(groupEntry)
+            context['groups'] = user_groups
+
+        return render(request, template_name='account/profile.html', context=context)
     return redirect(reverse('account_login')+'?next=/accounts/preferences/')
