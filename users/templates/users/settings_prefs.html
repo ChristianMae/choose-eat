@@ -9,9 +9,9 @@
 {% block subtext %}<a class="btn black" id="id_save" href="#" onclick="savePreferences();return false;">Save</a>{% endblock subtext %}
 
 {% block content %}
-<div class="row hide-on-small-only" id="pref_selection">
+<div class="row" id="pref_selection">
   {% for name, code in categories.items %} 
-  <div class="col m3 l3">
+  <div class="col s6 m3 l3">
     <div class="card">
       <div class="card-image">
         <img src="{% with 'recommender/pref-imgs/'|add:code|add:'.jpg' as image_static %}{% static image_static %}{% endwith %}">

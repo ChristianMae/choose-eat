@@ -48,6 +48,17 @@ class Group(models.Model):
 		return '{} (by {})'.format(self.name, self.creator)
 
 
+class History(models.Model):
+	"""
+	History model to log user experiences
+	"""
+	user = models.ForeignKey(User, on_delete=models.CASCADE)
+	resto = models.CharField(max_length=100)
+	categories = models.CharField(max_length=100)
+	isLiked = models.BooleanField()
+	date_went = models.DateField(auto_now=True)
+
+
 class Friendship(models.Model):
 	"""
 	Relationship of UserA and UserB (for Friend List)

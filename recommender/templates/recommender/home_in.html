@@ -10,14 +10,14 @@
 </div></li>
 <li><a href="{% url 'recommender:home' %}" class="waves-effect"><i class="fa fa-cutlery"></i>Get recommendations</a></li>
 <li><div class="divider"></div></li>
-<li><a href="#!" class="waves-effect"><i class="fa fa-user-circle"></i>My Profile</a></li>
-<li><a href="#!" class="waves-effect"><i class="fa fa-gears"></i>Account Settings</a></li>
+<li><a href="{% url 'users:account_profile' %}" class="waves-effect"><i class="fa fa-user-circle"></i>My Profile</a></li>
+<li><a href="{% url 'account_change_password' %}" class="waves-effect"><i class="fa fa-gears"></i>Account Settings</a></li>
 <li><div class="divider"></div></li>
 <li><a href="{% url 'account_logout' %}" class="waves-effect"><i class="fa fa-sign-out"></i>Logout</a></li>
 {% endblock mobile-menu %}
 
 {% block headercard %}
-<div class="row hide-on-med-and-up otherfont" style="position:relative;top:-68rem;" id="select_card">
+<div class="row hide-on-med-and-up otherfont" style="position:relative;top:-102rem;" id="select_card">
   <div class="col l3"></div>
   <div class="col s12 l6">
     <div class="form-container center-align" style="padding-bottom: 20px;">
@@ -30,7 +30,7 @@
   </div>
 </div>
 
-<div class="row hide-on-small-only hide-on-large-only otherfont" style="position:relative;top:-60rem;" id="select_card2">
+<div class="row hide-on-small-only hide-on-large-only otherfont" style="position:relative;top:-70rem;" id="select_card2">
   <div class="col l3"></div>
   <div class="col s12 l6">
     <div class="form-container center-align" style="padding-bottom: 20px;">
@@ -64,7 +64,7 @@
 </div>
 
 <ul id='userMenu' class='dropdown-content' >
-  <li><a href="#!" class="otherfont"><i class="fa fa-user-circle"></i>Profile</a></li>
+  <li><a href="{% url 'users:account_profile' %}" class="otherfont"><i class="fa fa-user-circle"></i>Profile</a></li>
   <li><a href="{% url 'account_change_password' %}" class="otherfont"><i class="fa fa-gears"></i>Settings</a></li>
   <li class="divider"></li>
   <li><a href="{% url 'account_logout' %}" class="otherfont"><i class="fa fa-sign-out"></i>Logout</a></li>
@@ -187,8 +187,8 @@
 
 <div class="row" id="results">
   <div class="col s12 center">
-    <img id="resto-img" class="z-depth-4 hide-on-small-only" style="border: 3px solid black; height:250px;width:350px; border-radius: 35%;" src=""/>
-    <img id="resto-img2" class="z-depth-4 hide-on-med-and-up" style="border: 3px solid black; height:200px;width:250px; border-radius: 35%;" src=""/>
+    <a target="_blank" id="resto-link" href=""><img id="resto-img" class="z-depth-4 hide-on-small-only hoverable" style="border: 3px solid black; height:250px;width:350px; border-radius: 35%;" src=""/>
+    <img id="resto-img2" class="z-depth-4 hide-on-med-and-up hoverable" style="border: 3px solid black; height:200px;width:250px; border-radius: 35%;" src=""/></a>
     <h4 id="resto-name" class="otherfont"></h3>
     <p id="resto-address"></p>
     <span class="center-align"><small id="resto-distance"></small> | <small id="resto-categories"></small></span><br /><br />
@@ -294,7 +294,7 @@ $('#nkey_rec').on('click', function(e) {
 
 $('#keyword_grec').on('submit', function(e) {
   e.preventDefault();
-  getGroupesults(e);
+  getGroupResults(e);
 });
 $('#nkey_grec').on('click', function(e) {
   getGroupResults(e);
@@ -536,6 +536,7 @@ function nextResto() {
   }
   var address = resultList[actualIndex].location.address2 === '' || resultList[actualIndex].location.address2 === null ? resultList[actualIndex].location.address1 : resultList[actualIndex].location.address1+', '+resultList[actualIndex].location.address2;
 
+  document.getElementById('resto-link').href = resultList[actualIndex].url;
   document.getElementById('resto-img').src = resultList[actualIndex].image_url;
   document.getElementById('resto-img2').src = resultList[actualIndex].image_url;
   document.getElementById('resto-name').innerHTML = resultList[actualIndex].name;

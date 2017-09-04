@@ -31,8 +31,8 @@
             </div></li>
             <li><a href="{% url 'recommender:home' %}" class="waves-effect"><i class="fa fa-cutlery"></i>Get recommendations</a></li>
             <li><div class="divider"></div></li>
-            <li><a href="#!" class="waves-effect"><i class="fa fa-user-circle"></i>My Profile</a></li>
-            <li><a href="#!" class="waves-effect"><i class="fa fa-gears"></i>Account Settings</a></li>
+            <li><a href="{% url 'users:account_profile' %}" class="waves-effect"><i class="fa fa-user-circle"></i>My Profile</a></li>
+            <li><a href="{% url 'account_change_password' %}" class="waves-effect"><i class="fa fa-gears"></i>Account Settings</a></li>
             <li><div class="divider"></div></li>
             <li><a href="{% url 'account_logout' %}" class="waves-effect"><i class="fa fa-sign-out"></i>Logout</a></li>
           </ul>
@@ -44,8 +44,8 @@
             </div>
 
             <ul id='userMenu' class='dropdown-content' >
-              <li><a href="#!" class="otherfont"><i class="fa fa-user-circle"></i>Profile</a></li>
-              <li><a href="#!" class="otherfont"><i class="fa fa-gears"></i>Settings</a></li>
+              <li><a href="{% url 'users:account_profile' %}" class="otherfont"><i class="fa fa-user-circle"></i>Profile</a></li>
+              <li><a href="{% url 'account_change_password' %}" class="otherfont"><i class="fa fa-gears"></i>Settings</a></li>
               <li class="divider"></li>
               <li><a href="{% url 'account_logout' %}" class="otherfont"><i class="fa fa-sign-out"></i>Logout</a></li>
             </ul>

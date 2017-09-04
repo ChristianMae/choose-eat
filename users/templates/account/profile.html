@@ -1,0 +1,61 @@
+{% extends 'users/base_other.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}Choose-Eat | Settings{% endblock title %}
+
+{% block header %}<img class="circle z-depth-5 hoverable responsive-img" src="{% if user.avatar_url %}{{ user.avatar_url }}{% else %}{% static  'recommender/default_avatar.jpg' %}{% endif %}" style="width:150px;height:150px;"></i><br>{% if user.get_full_name %}{{ user.get_full_name }}{% else %}{{ user.username }}{% endif %}{% endblock header %}
+{% block header_small %}<img class="circle z-depth-5 hoverable responsive-img" src="{% if user.avatar_url %}{{ user.avatar_url }}{% else %}{% static  'recommender/default_avatar.jpg' %}{% endif %}" style="width:200px;height:200px;"></i><br>{% if user.get_full_name %}{{ user.get_full_name }}{% else %}{{ user.username }}{% endif %}{% endblock header_small %}
+
+{% block subtext %}
+<h6 class="center-align otherfont">{{ user.bio }}</h6>
+<div class="row otherfont hide-on-large-only">
+  <div class="col s12">
+    <ul class="tabs">
+      <li class="tab col s4 disabled"><a class="black-text active"><i class="fa fa-unlock-alt"></i></a></li>
+      <li class="tab col s4"><a class="black-text" target="_self" href="{% url 'account_email' %}"><i class="fa fa-address-book"></i></a></li>
+      <li class="tab col s4"><a class="black-text" target="_self" href="{% url 'socialaccount_connections' %}"><i class="fa fa-users"></i></a></li>
+    </ul>
+  </div>
+</div>
+
+<div class="row otherfont hide-on-med-and-down">
+  <div class="col s12">
+    <ul class="tabs">
+      <li class="tab col s4 disabled"><a class="black-text active"><i class="fa fa-history left" style="margin-top:17px;margin-left:35px;margin-right:-30px;"></i>History</a></li>
+      <li class="tab col s4"><a class="black-text" target="_self" href="{% url 'account_email' %}"><i class="fa fa-group left" style="margin-top:17px;margin-left:35px;margin-right:-30px;"></i>Friends &amp; Groups</a></li>
+      <li class="tab col s4"><a class="black-text" target="_self" href="{% url 'socialaccount_connections' %}"><i class="fa fa-heart left" style="margin-top:17px;margin-left:35px;margin-right:-30px;"></i>Food Preferences</a></li>
+    </ul>
+  </div>
+</div>
+{% endblock subtext %}
+
+{% block content %}
+<h5 class="otherfont"><i class="fa fa-history"></i> History</h5>
+{% endblock %}
+
+
+{% block javascript %}
+<script>
+$(document).ready(function(){
+  {% if messages %}
+    {% for message in messages %}
+    Materialize.toast('{{ message }}', 3000, 'rounded');
+    {% endfor %}
+  {% endif %}
+});
+
+$(".button-collapse").sideNav();
+$('.dropdown-button').dropdown({
+    inDuration: 300,
+    outDuration: 225,
+    constrainWidth: true, // Does not change width of dropdown to that of the activator
+    hover: true, // Activate on hover
+    gutter: 0, // Spacing from edge
+    belowOrigin: true, // Displays dropdown below the button
+    alignment: 'left', // Displays dropdown with edge aligned to the left of button
+    stopPropagation: false // Stops event propagation
+  }
+);
+</script>
+{% endblock %}

@@ -7,7 +7,7 @@
 {% block header %}<i class="fa fa-gears"></i><br>Account Settings{% endblock header %}
 {% block header_small %}<i class="fa fa-gears"></i><br>Account Settings{% endblock header_small %}
 {% block subtext %}
-<div class="row otherfont hide-on-med-and-up">
+<div class="row otherfont hide-on-large-only">
   <div class="col s12">
     <ul class="tabs">
       <li class="tab col s4"><a class="black-text" target="_self" href="{% url 'account_change_password' %}"><i class="fa fa-unlock-alt"></i></a></li>
@@ -17,7 +17,7 @@
   </div>
 </div>
 
-<div class="row otherfont hide-on-small-only">
+<div class="row otherfont hide-on-med-and-down">
   <div class="col s12">
     <ul class="tabs">
       <li class="tab col s4"><a class="black-text" target="_self" href="{% url 'account_change_password' %}"><i class="fa fa-unlock-alt left" style="margin-top:17px;margin-left:35px;margin-right:-30px;"></i>Change Password</a></li>

@@ -5,6 +5,7 @@ from django.core import serializers
 from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 from allauth.account.signals import user_signed_up
+from allauth.socialaccount.signals import social_account_added, social_account_removed
 from allauth.socialaccount.models import SocialAccount
 from rest_framework.views import APIView
 from ceat.settings import CATEGORY_DICT, MY_URL
@@ -17,6 +18,29 @@ def social_profilepic(user, **kwargs):
     if socialaccount:
         picture_url = "http://graph.facebook.com/{0}/picture?width={1}&height={1}".format(socialaccount[0].uid, 256)
         user.avatar_url = picture_url
+        user.save()
+
+
+@receiver(social_account_added)
+def social_namepic_set(sociallogin, **kwargs):
+    user = sociallogin.account.user
+    user_socialAcc_count = SocialAccount.objects.filter(user=user).count()
+    if user_socialAcc_count == 1:
+        picture_url = "http://graph.facebook.com/{0}/picture?width={1}&height={1}".format(sociallogin.account.uid, 256)
+        user.avatar_url = picture_url
+        user.first_name = sociallogin.account.extra_data['first_name']
+        user.last_name = sociallogin.account.extra_data['last_name']
+        user.save()
+
+
+@receiver(social_account_removed)
+def social_namepic_remove(socialaccount, **kwargs):
+    user = socialaccount.user
+    user_socialAcc_count = SocialAccount.objects.filter(user=user).count()
+    if user_socialAcc_count == 0:
+        user.avatar_url = None
+        user.first_name = ''
+        user.last_name = ''
         user.save()
 
 
@@ -132,3 +156,9 @@ def settings_prefs(request):
         user_prefs = eval(request.user.preferences)
         return render(request, template_name='users/settings_prefs.html', context={'categories': CATEGORY_DICT, 'preferences': user_prefs})
     return redirect(reverse('account_login')+'?next=/preferences/')
+
+
+def account_profile(request):
+    if request.user.is_authenticated:
+        return render(request, template_name='account/profile.html', context={})
+    return redirect(reverse('account_login')+'?next=/accounts/preferences/')

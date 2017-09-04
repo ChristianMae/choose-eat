@@ -9,11 +9,11 @@
 {% block subtext %}Tell us which ones you like or dislike! (<span id="id_counter">10</span> left){% endblock subtext %}
 
 {% block content %}
-<div class="row hide-on-small-only" id="pref_selection">
+<div class="row" id="pref_selection">
   <ul id="pref_items">
   {% for name, code in categories.items %} 
   <li>
-  <div class="col m3 l3">
+  <div class="col s6 m3 l3">
     <div class="card">
       <div class="card-image">
         <img src="{% with 'recommender/pref-imgs/'|add:code|add:'.jpg' as image_static %}{% static image_static %}{% endwith %}">
