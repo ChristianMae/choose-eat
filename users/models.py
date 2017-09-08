@@ -2,7 +2,7 @@ from django.db import models
 from django.core import validators
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import AbstractUser
-from ceat.settings import DEFAULT_PREFS
+from ceat.settings import DEFAULT_PREFS, MY_URL
 
 
 class User(AbstractUser):
@@ -26,7 +26,7 @@ class User(AbstractUser):
 	bio = models.TextField(max_length=500, blank=True)
 	birth_date = models.DateField(null=True, blank=True)
 	preferences = models.TextField(blank=False, default=DEFAULT_PREFS)
-	avatar_url = models.CharField(max_length=256, blank=True, null=True)
+	avatar_url = models.CharField(max_length=256, default='{}static/recommender/default_avatar.jpg'.format(MY_URL))
 
 	def __str__(self):
 		return "{}".format(self.username)

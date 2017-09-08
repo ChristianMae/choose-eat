@@ -5,7 +5,7 @@
 <li><div class="user-view">
   <div class="background grey darken-4">
   </div>
-  <a href="#!user"><img class="circle" src="{% if user.avatar_url %}{{ user.avatar_url }}{% else %}{% static  'recommender/default_avatar.jpg' %}{% endif %}"></a>
+  <a href="#!user"><img class="circle" src="{{ user.avatar_url }}"></a>
   <a href="#!name"><span class="white-text name">{% if user.get_full_name %}{{ user.get_full_name }}{% else %}{{ user.username }}{% endif %}</span></a>
 </div></li>
 <li><a href="{% url 'recommender:home' %}" class="waves-effect"><i class="fa fa-cutlery"></i>Get recommendations</a></li>
@@ -59,7 +59,7 @@
 
 {% block menu %}
 <div class="row dropdown-button" data-activates='userMenu'>
-  <img src="{% if user.avatar_url %}{{ user.avatar_url }}{% else %}{% static  'recommender/default_avatar.jpg' %}{% endif %}" class="circle responsive-img left" alt="{{ user.get_full_name }}" style="width:35px;height:35px;margin-top:15px;margin-right:15px;">
+  <img src="{{ user.avatar_url }}" class="circle responsive-img left" alt="{{ user.get_full_name }}" style="width:35px;height:35px;margin-top:15px;margin-right:15px;">
   <li class="otherfont smtext">{% if user.get_full_name %}{{ user.get_full_name }}{% else %}{{ user.username }}{% endif %}</li>
 </div>
 
@@ -224,7 +224,7 @@
   </div>
   <div class="row center-align">
     <form>{% csrf_token %}</form>
-    <a class="waves-effect waves-light btn-large green otherfont" href="javascript:finishRecommendation();"><i class="fa fa-thumbs-up left"></i>I'm here</a>
+    <a id="id_finishRec" class="waves-effect waves-light btn-large green otherfont" href="javascript:finishRecommendation();"><i class="fa fa-thumbs-up left"></i>I'm here</a>
   </div>
 </div>
 {% endblock content %}
@@ -586,7 +586,7 @@ function finishRecommendation() {
     url: '{% url 'addHistory' %}',
     data: acceptData,
     success: function(response) {
-      console.log(response);
+      document.getElementById('id_finishRec').href = '#';
       Materialize.toast('Bon appétit! Share your experience later! (Profile > History)', 5000, 'rounded');
       retryRec();
     }
@@ -648,6 +648,7 @@ function retryRec() {
   $('#select_card2').show();
   $('#select_card3').show();
 
+  document.getElementById('id_finishRec').href = 'javascript:finishRecommendation()';
   document.getElementById('right-panel').innerHTML = '';
   index = 0;
 }

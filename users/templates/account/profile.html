@@ -240,7 +240,9 @@ $('#newGroupForm').on('submit', function(e) {
     url: '{% url 'addGroup' %}',
     data: params,
     success: function(response) {
-      Materialize.toast('Group created (refresh page)', 3000, 'rounded');
+      setTimeout(function() { 
+        window.location.replace("{% url 'users:account_profile' %}"); 
+      }, 2000);
     }
   });
 });
@@ -278,7 +280,10 @@ function savePreferences() {
     url: '{% url 'setPrefs' %}',
     data: params,
     success: function(response) {
-      Materialize.toast('Preferences updated', 3000, 'rounded');
+      Materialize.toast('Preferences updated, refreshing page...', 3000, 'rounded');
+      setTimeout(function() { 
+        window.location.replace("{% url 'users:account_profile' %}"); 
+      }, 2000);
     }
   });
 }
@@ -316,7 +321,10 @@ function saveHistory() {
     url: '{% url 'setHistory' %}',
     data: params,
     success: function(response) {
-      Materialize.toast('History updated (Refresh the page)', 3000, 'rounded');
+      Materialize.toast('History updated, refreshing page...', 3000, 'rounded');
+      setTimeout(function() { 
+        window.location.replace("{% url 'users:account_profile' %}"); 
+      }, 2000);
     }
   });
 }
