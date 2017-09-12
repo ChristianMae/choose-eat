@@ -19,7 +19,7 @@ from django.contrib import admin
 from rest_framework import routers, serializers, viewsets
 from rest_framework_swagger.views import get_swagger_view
 from recommender.views import soloRecommendation, groupRecommendation, trialRecommendation
-from users.views import setPreferences, login, registration, addHistory, setHistory, addGroup
+from users.views import setPreferences, login, registration, addHistory, setHistory, addGroup, FacebookLogin
 from users.models import User, Group
 
 
@@ -70,4 +70,7 @@ urlpatterns = [
     url(r'^accounts/logout/$', logout_view, {'next_page': '/'}),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^accounts/', include('allauth.urls')),
+    url(r'^rest-auth/', include('rest_auth.urls')),
+    url(r'^rest-auth/registration/', include('rest_auth.registration.urls')),
+    url(r'^rest-auth/facebook/$', FacebookLogin.as_view(), name='fb_login'),
 ]

@@ -8,9 +8,15 @@ from django.core.urlresolvers import reverse
 from allauth.account.signals import user_signed_up
 from allauth.socialaccount.signals import social_account_added, social_account_removed
 from allauth.socialaccount.models import SocialAccount
+from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
 from rest_framework.views import APIView
+from rest_auth.registration.views import SocialLoginView
 from ceat.settings import CATEGORY_DICT, MY_URL
 from .models import User, History, Group
+
+
+class FacebookLogin(SocialLoginView):
+    adapter_class = FacebookOAuth2Adapter
 
 
 @receiver(user_signed_up)
