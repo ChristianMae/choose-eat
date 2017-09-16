@@ -10,6 +10,7 @@ from allauth.socialaccount.signals import social_account_added, social_account_r
 from allauth.socialaccount.models import SocialAccount
 from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
 from rest_auth.registration.views import SocialLoginView
 from ceat.settings import CATEGORY_DICT, MY_URL
 from .models import User, History, Group
@@ -51,81 +52,12 @@ def social_namepic_remove(socialaccount, **kwargs):
         user.save()
 
 
-class login(APIView):
-    """
-    Login Endpoint
-
-    Parameters:
-    username (string) - User's username
-    password (string) - User's password
-    """
-    def get(self, request, format=None):
-        """
-        Returns user details if credentials are valid, else an error
-        """
-        username = self.request.query_params.get('username')
-        password = self.request.query_params.get('password')
-        
-        try:
-            user = User.objects.get(username=username)
-            if user.check_password(password):
-                data = serializers.serialize('json', [user,])
-                struct = json.loads(data)
-                data = json.dumps(struct[0])
-
-                response = data
-            else:
-                response = json.dumps({'error': 'Invalid password!'})
-        except User.DoesNotExist:
-            response = json.dumps({'error': 'User does not exist!'}) 
-        
-        return HttpResponse(response, content_type="application/json")
-
-
-class registration(APIView):
-    """
-    Registration Endpoint
-
-    Parameters:
-    username (string) - User's username
-    password (string) - User's password
-    first_name (string) - User's first name
-    last_name (string) - User's last name
-    """
-    def post(self, request, format=None):
-        """
-        Returns user details if credentials are valid, else an error
-        """
-        username = self.request.data.get('username')
-        password = self.request.data.get('password')
-        first_name = self.request.data.get('first_name')
-        last_name = self.request.data.get('last_name')
-        
-        try:
-            user = User.objects.create(
-            username=validated_data['username'],
-            first_name=validated_data['first_name'],
-            last_name=validated_data['last_name']
-            )
-
-            user.set_password(validated_data['password'])
-            user.save()
-
-            data = serializers.serialize('json', [user,])
-            struct = json.loads(data)
-            data = json.dumps(struct[0])
-
-            response = data
-        except Exception as e:
-            response = e if not hasattr(e, 'message') else e.message
-        
-        return HttpResponse(json.dumps({'error': response}))
-
-
 class setPreferences(APIView):
     """
     Set Preferences Endpoint
     """
+    permission_classes = (IsAuthenticated,)
+
     def post(self, request, format=None):
         """
         Sets user preferences, then returns the changes
@@ -149,6 +81,8 @@ class addGroup(APIView):
     """
     Add Group Endpoint
     """
+    permission_classes = (IsAuthenticated,)
+
     def post(self, request, format=None):
         """
         Creates new group, then returns the details
@@ -172,6 +106,8 @@ class setHistory(APIView):
     """
     Set History Endpoint
     """
+    permission_classes = (IsAuthenticated,)
+
     def post(self, request, format=None):
         """
         Rates user history, then returns the changes
@@ -209,6 +145,8 @@ class addHistory(APIView):
     """
     Add History Endpoint
     """
+    permission_classes = (IsAuthenticated,)
+
     def post(self, request, format=None):
         """
         Adds to user history, then returns the changes

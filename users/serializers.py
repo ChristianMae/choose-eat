@@ -3,9 +3,9 @@ from .models import User, History
 import json
 
 class UserDetailsSerializer(serializers.ModelSerializer):
-    history = serializers.SerializerMethodField()
+    user_history = serializers.SerializerMethodField()
 
-    def get_history(self, obj):
+    def get_user_history(self, obj):
         try:
             myUser = User.objects.get(id=obj.id)
             userHistory = History.objects.filter(user=myUser)
@@ -24,9 +24,9 @@ class UserDetailsSerializer(serializers.ModelSerializer):
         except Exception as e:
             return str(e)
 
-    ratedhistory = serializers.SerializerMethodField()
+    user_ratedhistory = serializers.SerializerMethodField()
 
-    def get_ratedhistory(self, obj):
+    def get_user_ratedhistory(self, obj):
         try:
             myUser = User.objects.get(id=obj.id)
             userHistory = History.objects.filter(user=myUser)
@@ -45,7 +45,7 @@ class UserDetailsSerializer(serializers.ModelSerializer):
         except Exception as e:
             return str(e)
 
-class UserDetailsSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = User
-        fields = ('id', 'username', 'first_name', 'last_name', 'email', 'bio', 'birth_date', 'preferences', 'avatar_url', 'date_joined', 'history', 'ratedhistory')
+        fields = ('id', 'username', 'first_name', 'last_name', 'email', 'bio', 'birth_date', 'preferences', 'avatar_url', 'date_joined', 'user_history', 'user_ratedhistory')

@@ -545,7 +545,7 @@ function nextResto() {
 
   var categories = [];
   var categoriesCodes = [];
-  acceptData.categories = '';
+  acceptData.categories = '[';
   for (var i = 0; i < resultList[actualIndex].categories.length; i++) {
     acceptData.categories += "'"+resultList[actualIndex].categories[i].alias+"',";
     categories.push(resultList[actualIndex].categories[i].title);

@@ -19,42 +19,12 @@ from django.contrib import admin
 from rest_framework import routers, serializers, viewsets
 from rest_framework_swagger.views import get_swagger_view
 from recommender.views import soloRecommendation, groupRecommendation, trialRecommendation
-from users.views import setPreferences, login, registration, addHistory, setHistory, addGroup, FacebookLogin
-from users.models import User, Group
+from users.views import setPreferences, addHistory, setHistory, addGroup, FacebookLogin
 
-
-# Serializers define the API representation.
-# User Serializer
-class UserSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = User
-        fields = ('url', 'id', 'username', 'first_name', 'last_name', 'email', 'bio', 'birth_date', 'preferences', 'date_joined')
-
-# ViewSets define the view behavior.
-class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-
-# User Serializer
-class GroupSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = Group
-        fields = ('url', 'name', 'creator', 'members')
-
-# ViewSets define the view behavior.
-class GroupViewSet(viewsets.ModelViewSet):
-    queryset = Group.objects.all()
-    serializer_class = GroupSerializer
-
-# Routers provide an easy way of automatically determining the URL conf.
-router = routers.DefaultRouter()
-router.register(r'users', UserViewSet)
-router.register(r'groups', GroupViewSet)
 
 schema_view = get_swagger_view(title="Choose-Eat API")
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^api/', include(router.urls)),
     url(r'^api-endpoints/', schema_view),
     url(r'^api/soloRecommendation', soloRecommendation.as_view(), name="soloRec"),
     url(r'^api/groupRecommendation', groupRecommendation.as_view(), name="groupRec"),
@@ -63,8 +33,6 @@ urlpatterns = [
     url(r'^api/setHistory', setHistory.as_view(), name="setHistory"),
     url(r'^api/addHistory', addHistory.as_view(), name="addHistory"),
     url(r'^api/addGroup', addGroup.as_view(), name="addGroup"),
-    url(r'^api/login', login.as_view()),
-    url(r'^api/registration', registration.as_view()),
     url(r'', include('recommender.urls', namespace='recommender')),
     url(r'', include('users.urls', namespace='users')),
     url(r'^accounts/logout/$', logout_view, {'next_page': '/'}),

@@ -5,6 +5,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
 from allauth.socialaccount.models import SocialAccount
 from users.models import User, Group
 from ceat.settings import MY_URL, GOOGLE_API_KEY
@@ -22,6 +23,8 @@ class soloRecommendation(APIView):
     longitude (double) - Longitude of User's current location
     term (string) - Optional search term
     """
+    permission_classes = (IsAuthenticated,)
+
     def get(self, request, format=None):
         """
         Returns restaurant recommendation based on user's preferences and location
@@ -76,6 +79,8 @@ class groupRecommendation(APIView):
     longitude (double) - Longitude of User's current location
     term (string) - Optional search term
     """
+    permission_classes = (IsAuthenticated,)
+    
     def get(self, request, format=None):
         """
         Returns restaurant recommendation based on group's preferences and location
