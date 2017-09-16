@@ -167,18 +167,18 @@ $(document).ready(function() {
 
 $('#trial_rec').on('submit', function(e) {
   e.preventDefault();
-  showTrialRec();
+  showTrialRec(e);
 });
 $('#trial_rec2').on('submit', function(e) {
   e.preventDefault();
-  showTrialRec();
+  showTrialRec(e);
 });
 $('#trial_rec3').on('submit', function(e) {
   e.preventDefault();
-  showTrialRec();
+  showTrialRec(e);
 });
 
-function showTrialRec() {
+function showTrialRec(event) {
   lat = document.getElementById('id_latitude').innerHTML;
   lng = document.getElementById('id_longitude').innerHTML;
 
@@ -189,12 +189,19 @@ function showTrialRec() {
   
   var params = {
     latitude: lat,
-    longitude: lng,
-    term: $('#id_term').val()
+    longitude: lng
   };
-
+  if (event.target.id == 'trial_rec') {
+    params.term = $('#id_term3').val();
+  } else if (event.target.id == 'trial_rec2') {
+    params.term = $('#id_term2').val();
+  } else {
+    params.term = $('#id_term').val();
+  }
+  
   document.getElementById('id_term').value=null;
   document.getElementById('id_term2').value=null;
+  document.getElementById('id_term3').value=null;
 
   $('html, body').animate({
       scrollTop: $("#about").offset().top-75
@@ -262,8 +269,16 @@ function nextResto() {
   } else {
     index = 0;
     actualIndex = 0;
-    resultList = restoList.likes;
-    subtext.innerHTML = "That was all of them! Back to start!"
+    if (restoList.likes.length > 0) {
+      resultList = restoList.likes;
+    } else if (restoList.semilikes.length > 0) {
+      resultList = restoList.semilikes;
+    } else if (restoList.others.length > 0) {
+      resultList = restoList.others;
+    } else {
+      restulList = restoList.dislikes;
+    }
+    subtext.innerHTML = "That was all of them!"
   }
 
   var categories = [];
@@ -295,7 +310,7 @@ function previousResto() {
 function acceptResto() {
   document.getElementById('hdr').innerHTML = resultList[actualIndex].name;
   document.getElementById('hdr2').innerHTML = resultList[actualIndex].name;
-  document.getElementById('subtext').innerHTML = "Mode of Travel:<br/><div class='col m4 l4'></div><select id='mode' class='browser-default col s12 m4 l4'><option value='DRIVING'>Driving</option><option value='WALKING'>Walking</option><option value='BICYCLING'>Bicycling</option><option value='TRANSIT'>Transit</option></select>";
+  document.getElementById('subtext').innerHTML = "Mode of Travel:<br/><div class='col m4 l4'></div><select id='mode' class='browser-default col s12 m4 l4'><option value='DRIVING'>Driving</option><option value='WALKING'>Walking</option><option value='TRANSIT'>Transit</option></select>";
   initMap();
   $('#results').hide();
   $('#accepted').show();

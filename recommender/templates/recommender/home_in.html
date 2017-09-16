@@ -531,12 +531,21 @@ function nextResto() {
   } else {
     index = 0;
     actualIndex = 0;
-    resultList = restoList.likes;
-    subtext.innerHTML = "That was all of them! Back to start!"
+    if (restoList.likes.length > 0) {
+      resultList = restoList.likes;
+    } else if (restoList.semilikes.length > 0) {
+      resultList = restoList.semilikes;
+    } else if (restoList.others.length > 0) {
+      resultList = restoList.others;
+    } else {
+      restulList = restoList.dislikes;
+    }
+    subtext.innerHTML = "That was all of them!"
   }
 
   var categories = [];
   var categoriesCodes = [];
+  acceptData.categories = '';
   for (var i = 0; i < resultList[actualIndex].categories.length; i++) {
     acceptData.categories += "'"+resultList[actualIndex].categories[i].alias+"',";
     categories.push(resultList[actualIndex].categories[i].title);
